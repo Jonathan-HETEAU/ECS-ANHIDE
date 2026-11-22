@@ -1,5 +1,6 @@
 name: Lifetime
 description: Décompte le temps restant et détruit les entités expirées.
+phase: Resolution
 per_entity: true
 components:
   Lifetime: write

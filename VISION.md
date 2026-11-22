@@ -52,6 +52,11 @@ Quand elle revient au point de départ, une frame s'est écoulée.
 5. **L'IDE ne génère pas de code.** Il produit des contrats ; le code est écrit à l'extérieur.
 6. **Bureau et hors ligne.** Aucune fonctionnalité ne dépend d'un service en ligne.
 7. **Prévu pour l'échelle.** Le débogage réel et la visualisation fonctionnent avec des millions d'entités.
+8. **L'IDE signale, l'utilisateur décide.** L'IDE détecte, calcule et signale : conflits,
+   ambiguïtés, cycles, incohérences. Les choix de conception du jeu (ordre des systèmes, phases,
+   contraintes…) appartiennent à l'utilisateur, humain ou IA. Quand l'IDE doit quand même produire
+   un résultat, par exemple ordonner deux systèmes ambigus, il applique une règle déterministe et
+   documentée, et il le signale.
 
 ## 5. Les concepts du modèle
 
@@ -88,7 +93,7 @@ systems/damage/
 ```yaml
 name: Damage
 description: Applique aux points de vie les dégâts reçus pendant la frame.
-phase: Logique
+phase: Resolution
 per_entity: true         # chaque entité est traitée à partir de ses seules données
 every: 1                 # fréquence : une boucle sur N (1 par défaut)
 components:
@@ -264,8 +269,8 @@ via:
 L'ordre de référence et les phases :
 
 ```yaml
-phases: [Entrees, Logique, Rendu]
-order: [PlayerInput, EnemyAI, Movement, Collision, Damage, Death, Render]
+phases: [Entrees, Logique, Physique, Resolution, Rendu]
+order: [PlayerInput, EnemyAI, Weapon, Movement, Collision, Damage, Lifetime, Death, Render]
 ```
 
 Un archétype :

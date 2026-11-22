@@ -1,5 +1,6 @@
 name: Damage
 description: Applique aux points de vie les dégâts reçus pendant la frame.
+phase: Resolution
 per_entity: true
 components:
   Health: write

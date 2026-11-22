@@ -1,5 +1,6 @@
 name: Render
 description: Dessine les entités visibles.
+phase: Rendu
 per_entity: true
 components:
   Position: read

@@ -1,8 +1,11 @@
 name: Death
 description: Détruit les entités mortes et met à jour le score.
+phase: Resolution
 components:
   Dead: with
 resources:
   GameState: write
 structural:
   despawn: true
+after:
+- Damage

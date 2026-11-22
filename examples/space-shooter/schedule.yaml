@@ -1,10 +1,16 @@
+phases:
+- Entrees
+- Logique
+- Physique
+- Resolution
+- Rendu
 order:
 - PlayerInput
 - EnemyAI
 - Weapon
 - Movement
-- Lifetime
 - Collision
 - Damage
+- Lifetime
 - Death
 - Render

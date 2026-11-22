@@ -1,5 +1,6 @@
 name: Weapon
 description: Crée des projectiles quand le joueur tire.
+phase: Logique
 components:
   Position: read
   Player: with

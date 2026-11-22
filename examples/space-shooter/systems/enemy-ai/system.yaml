@@ -1,5 +1,6 @@
 name: EnemyAI
 description: Oriente la vitesse des ennemis vers leur cible.
+phase: Logique
 components:
   Position: read
   Velocity: write

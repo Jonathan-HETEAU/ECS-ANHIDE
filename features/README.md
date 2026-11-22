@@ -49,9 +49,14 @@ Exigences : ORD-002
 
 ## Le projet d'exemple `space-shooter`
 
-Beaucoup de scénarios s'appuient sur un même projet de référence, à créer dans
-`examples/space-shooter/` au début de la phase 1. Sa composition est figée ici : changer ce projet
-revient à changer les scénarios.
+Beaucoup de scénarios s'appuient sur un même projet de référence, dans
+`examples/space-shooter/`. Sa composition est figée ici : changer ce projet revient à changer les
+scénarios.
+
+Ce projet joue le rôle d'un utilisateur d'ECS NIDE, et il doit être **exemplaire** : ses choix de
+conception sont les plus sensés possible, et il ne laisse aucune décision en suspens. Le test
+`crates/ecs-nide-specs/tests/exemple.rs` le vérifie : aucun diagnostic, aucune ambiguïté quel que
+soit le profil du moteur, une phase pour chaque système, et le rendu seul en fin de boucle.
 
 **Composants** : `Position` (vec2), `Velocity` (vec2), `Rotation` (f32), `Sprite`, `Collider` (radius),
 `Health` (current, max), `Hit` (amount), `Lifetime` (remaining), `Target` (entity), et les marqueurs
@@ -68,21 +73,35 @@ revient à changer les scénarios.
 | Bullet   | Position, Velocity, Sprite, Collider, Lifetime |
 | Particle | Position, Velocity, Lifetime |
 
+**Phases**, dans l'ordre : `Entrees`, `Logique`, `Physique`, `Resolution`, `Rendu`.
+
 **Systèmes**, dans l'ordre de référence :
 
-| système | accès | changements structurels |
-|---|---|---|
-| PlayerInput | read `InputState`ᴿ, write Velocity, with Player | |
-| EnemyAI | read Position, write Velocity, optional Target, with Enemy, without Dead | |
-| Weapon | read Position, read `InputState`ᴿ, with Player | peut créer Bullet |
-| Movement | read Velocity, read `Time`ᴿ, write Position | |
-| Lifetime | write Lifetime, read `Time`ᴿ | peut détruire |
-| Collision | read Position, read Collider | peut ajouter Hit |
-| Damage | write Health, read Hit, without Invulnerable — après Collision | retire Hit ; peut ajouter Dead |
-| Death | with Dead, write `GameState`ᴿ | détruit |
-| Render | read Position, read Sprite | |
+| système | phase | accès | changements structurels | ordre |
+|---|---|---|---|---|
+| PlayerInput | Entrees | read `InputState`ᴿ, write Velocity, with Player | | |
+| EnemyAI | Logique | read Position, write Velocity, optional Target, with Enemy, without Dead | | |
+| Weapon | Logique | read Position, read `InputState`ᴿ, with Player | peut créer Bullet | |
+| Movement | Physique | read Velocity, read `Time`ᴿ, write Position | | |
+| Collision | Physique | read Position, read Collider | peut ajouter Hit | après Movement |
+| Damage | Resolution | write Health, read Hit, without Invulnerable | retire Hit ; peut ajouter Dead | après Collision |
+| Lifetime | Resolution | write Lifetime, read `Time`ᴿ | peut détruire | |
+| Death | Resolution | with Dead, write `GameState`ᴿ | détruit | après Damage |
+| Render | Rendu | read Position, read Sprite | | |
 
 ᴿ = ressource.
+
+Le plan d'exécution qui en résulte, avec le profil générique :
+
+| étape | systèmes |
+|---|---|
+| 1 | PlayerInput |
+| 2 | EnemyAI, Weapon |
+| 3 | Movement |
+| 4 | Collision |
+| 5 | Damage, Lifetime |
+| 6 | Death |
+| 7 | Render |
 
 ## Index
 

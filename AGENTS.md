@@ -26,6 +26,15 @@ Ce fichier s'adresse à toute personne ou IA qui travaille sur ce dépôt.
 - **Une exigence qui change entraîne la mise à jour de ses scénarios et de ses tests**, dans le même commit.
 - **Ne jamais désactiver, ignorer ou affaiblir un test pour obtenir une exécution au vert.**
 
+## Ce qui relève de l'IDE, et ce qui relève de l'utilisateur
+
+- **L'IDE signale, l'utilisateur décide** (principe 8 de `VISION.md`). Le code d'ECS NIDE détecte
+  et signale les problèmes d'un projet ; il ne prend jamais de décision de conception du jeu à la
+  place de l'utilisateur.
+- Le **projet d'exemple** `examples/space-shooter` joue le rôle d'un utilisateur : quand on y fait
+  un choix de conception, on fait le plus sensé. Il doit rester exemplaire (aucun diagnostic,
+  aucune ambiguïté), ce que vérifie `crates/ecs-nide-specs/tests/exemple.rs`.
+
 ## Choix techniques
 
 | Partie | Technologie |
