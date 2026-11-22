@@ -5,6 +5,38 @@
 # - un scénario actif ne redevient jamais inactif (voir AGENTS.md) ;
 # - la valeur `tous` active tous les scénarios d'un fichier.
 
+01-dossier-projet.spec.md:
+- Créer un projet produit un dossier complet et valide
+- Un projet rouvert est identique au projet enregistré
+- Enregistrer sans modification ne change aucun fichier
+- Un fichier invalide est signalé sans bloquer le reste du projet
+- Un format plus récent que l'IDE n'est jamais écrasé
+- Les fichiers générés sont rédigés dans la langue du projet
+
+02-modelisation.spec.md:
+- Un composant déclare des champs typés, contraints et initialisés
+- Un composant sans champ est un marqueur
+- Deux composants ne peuvent pas porter le même nom
+- Une ressource est une donnée globale unique
+- Un système sélectionne les entités d'après ses accès
+- Un système déclare ses changements structurels, certains ou possibles
+- Un archétype décrit une composition et un volume estimé
+- Renommer un composant met à jour toutes ses références
+- Supprimer un élément référencé demande une confirmation
+- Un composant activable désactivé compte comme absent
+- Activer ou désactiver un composant n'est pas un changement structurel
+- Un filtre de changement restreint le système aux entités modifiées
+- Un composant porte une indication de stockage
+- Un canal de messages transporte des données typées
+- Un système déclare s'il traite chaque entité indépendamment
+- Les systèmes se rattachent à des phases
+- Un système peut ne s'exécuter qu'une boucle sur N
+- Un événement porte des données et peut viser une entité
+- Un observateur réagit à un seul déclencheur
+- Un système lit les composants de la cible d'une relation
+- Un archétype crée ses entités liées
+- Un événement d'entité peut se propager le long d'une relation
+
 03-ordonnancement.spec.md:
 - Chaque système activé apparaît exactement une fois dans le plan
 - Deux systèmes qui écrivent le même composant ne sont jamais dans la même étape
@@ -28,3 +60,21 @@
 - Les observateurs n'occupent aucune étape
 - Une cascade circulaire d'observateurs est signalée
 - Une lecture via une relation compte comme une lecture
+
+09-validation.spec.md:
+- Une référence inconnue est une erreur
+- Un composant que personne ne fournit est signalé
+- Un système qui ne sélectionne aucune entité atteignable est signalé
+- Un archétype obtenu par ajout de composant est atteignable
+- Un composant inutilisé est signalé
+- Un système sans spécification ou sans test est signalé
+- Chaque diagnostic indique son niveau, son message et son emplacement
+- Avec des phases déclarées, chaque système doit avoir sa phase
+- On ne peut activer ou désactiver qu'un composant activable
+- Un filtre de changement porte sur un composant sélectionné
+- Une clé déclarée deux fois est une erreur
+- Un canal sans émetteur ou sans lecteur est signalé
+- Un concept non pris en charge par le moteur est signalé
+- Un observateur que rien ne déclenche est signalé
+- Un événement que personne n'observe est signalé
+- Un accès via une relation exige de sélectionner sa source

@@ -26,7 +26,7 @@ Exigences : VAL-003
 * L'archétype "Asteroid" ne contient pas "Frozen"
 * Le système "IceRay" peut ajouter "Frozen" aux entités qui possèdent "Velocity"
 * Le système "Freeze" exige "Frozen" et "Velocity"
-* La validation ne signale rien pour "Freeze"
+* La validation ne signale pas que "Freeze" ne sélectionne aucun archétype atteignable
 
 ## Un composant inutilisé est signalé
 Exigences : VAL-004
@@ -67,10 +67,10 @@ Exigences : VAL-010
 * Le système "RebuildBounds" lit "Collider" et filtre les changements de "Velocity"
 * La validation signale que "RebuildBounds" filtre "Velocity" sans le sélectionner
 
-## Un système ne lit pas le canal sur lequel il émet
+## Une clé déclarée deux fois est une erreur
 Exigences : VAL-011
-* Le système "Echo" émet sur le canal "Ping" et lit le canal "Ping"
-* La validation signale que "Echo" émet et lit le même canal "Ping"
+* Le fichier du système "Echo" déclare le canal "Ping" deux fois, en émission puis en lecture
+* La validation signale la clé en double "Ping" dans "systems/echo/system.yaml"
 
 ## Un canal sans émetteur ou sans lecteur est signalé
 Exigences : VAL-012

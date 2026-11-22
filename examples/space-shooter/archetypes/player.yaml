@@ -2,6 +2,7 @@ name: Player
 components:
 - Position
 - Velocity
+- Rotation
 - Sprite
 - Collider
 - Health

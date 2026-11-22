@@ -1,9 +1,13 @@
+use std::collections::BTreeMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
+use ecs_nide_core::edit::EditError;
 use ecs_nide_core::load::load_project;
+use ecs_nide_core::save::save_project;
 use ecs_nide_core::schedule::{Plan, PlanError, compute_plan};
-use ecs_nide_core::{EngineProfile, Level, Project};
+use ecs_nide_core::validate::validate;
+use ecs_nide_core::{Diagnostic, EngineProfile, Level, Project};
 
 use crate::repo;
 
@@ -11,8 +15,21 @@ use crate::repo;
 pub struct World {
     pub project: Project,
     pub profile: EngineProfile,
-    /// Copie temporaire du dossier projet, quand le scénario ouvre un projet d'exemple.
-    pub project_dir: Option<tempfile::TempDir>,
+    /// Dossier temporaire où le scénario crée et enregistre ses projets.
+    workspace: tempfile::TempDir,
+    /// Dossier du projet courant, quand il a été ouvert, créé ou enregistré.
+    pub project_dir: Option<PathBuf>,
+    /// Diagnostics du dernier chargement du projet courant.
+    pub load_diagnostics: Vec<Diagnostic>,
+    pub read_only: bool,
+    /// Contenu des fichiers du projet au moment de son ouverture.
+    pub snapshot: BTreeMap<PathBuf, Vec<u8>>,
+    /// Erreurs de validation au moment de l'ouverture du projet.
+    pub baseline_errors: Vec<String>,
+    /// Dernier dossier dans lequel le projet a été enregistré.
+    pub saved_dir: Option<PathBuf>,
+    pub reopened: Option<Project>,
+    pub edit_result: Option<Result<(), EditError>>,
     pub plan: Option<Result<Plan, PlanError>>,
     pub plans: Vec<Plan>,
 }
@@ -22,7 +39,15 @@ impl Default for World {
         Self {
             project: Project::new("scenario"),
             profile: EngineProfile::generic(),
+            workspace: tempfile::tempdir().expect("dossier temporaire"),
             project_dir: None,
+            load_diagnostics: Vec::new(),
+            read_only: false,
+            snapshot: BTreeMap::new(),
+            baseline_errors: Vec::new(),
+            saved_dir: None,
+            reopened: None,
+            edit_result: None,
             plan: None,
             plans: Vec::new(),
         }
@@ -30,34 +55,104 @@ impl Default for World {
 }
 
 impl World {
-    /// Copie le projet d'exemple dans un dossier temporaire et le charge.
+    /// Un sous-dossier neuf de l'espace de travail du scénario.
+    pub fn new_dir(&self, name: &str) -> PathBuf {
+        let mut path = self.workspace.path().join(name);
+        let mut n = 1;
+        while path.exists() {
+            n += 1;
+            path = self.workspace.path().join(format!("{name}-{n}"));
+        }
+        path
+    }
+
+    pub fn dir(&self) -> Result<&Path, String> {
+        self.project_dir
+            .as_deref()
+            .ok_or_else(|| "aucun dossier projet".to_string())
+    }
+
+    /// Copie le projet d'exemple dans l'espace de travail et l'ouvre.
     pub fn open_example(&mut self, name: &str) -> Result<(), String> {
         let source = repo::root().join("examples").join(name);
-        let dir = tempfile::tempdir().map_err(|e| e.to_string())?;
-        copy_dir(&source, dir.path()).map_err(|e| format!("copie de {name} impossible : {e}"))?;
-        let loaded = load_project(dir.path()).map_err(|e| e.to_string())?;
-        let errors: Vec<String> = loaded
-            .diagnostics
-            .iter()
-            .filter(|d| d.level == Level::Error)
-            .map(ToString::to_string)
-            .collect();
+        let dir = self.new_dir(name);
+        copy_dir(&source, &dir).map_err(|e| format!("copie de {name} impossible : {e}"))?;
+        self.load(&dir)?;
+        if self.read_only {
+            return Ok(());
+        }
+        let errors = self.errors();
         if !errors.is_empty() {
             return Err(format!(
                 "le projet {name} contient des erreurs :\n{}",
                 errors.join("\n")
             ));
         }
-        self.project = loaded.project;
-        self.project_dir = Some(dir);
+        self.snapshot = snapshot(&dir);
+        self.baseline_errors = errors;
         Ok(())
     }
 
-    /// Calcule le plan ; pour un projet ouvert depuis un dossier, l'écrit aussi (ORD-011).
+    /// Charge le projet contenu dans `dir`, qui devient le projet courant.
+    pub fn load(&mut self, dir: &Path) -> Result<(), String> {
+        let loaded = load_project(dir).map_err(|e| e.to_string())?;
+        self.project = loaded.project;
+        self.load_diagnostics = loaded.diagnostics;
+        self.read_only = loaded.read_only;
+        self.project_dir = Some(dir.to_path_buf());
+        Ok(())
+    }
+
+    /// Recharge le projet courant depuis son dossier.
+    pub fn reload(&mut self) -> Result<(), String> {
+        let dir = self.dir()?.to_path_buf();
+        self.load(&dir)
+    }
+
+    /// Enregistre le projet courant dans son dossier, en lui en créant un s'il n'en a pas.
+    pub fn persist(&mut self) -> Result<PathBuf, String> {
+        let dir = match &self.project_dir {
+            Some(dir) => dir.clone(),
+            None => self.new_dir("projet"),
+        };
+        save_project(&self.project, &dir).map_err(|e| e.to_string())?;
+        self.project_dir = Some(dir.clone());
+        Ok(dir)
+    }
+
+    /// Diagnostics du dernier chargement, puis de la validation du modèle courant.
+    pub fn diagnostics(&self) -> Vec<Diagnostic> {
+        let mut all = self.load_diagnostics.clone();
+        all.extend(validate(&self.project, &self.profile));
+        all
+    }
+
+    pub fn errors(&self) -> Vec<String> {
+        self.diagnostics()
+            .into_iter()
+            .filter(|d| d.level == Level::Error)
+            .map(|d| d.to_string())
+            .collect()
+    }
+
+    /// Le premier diagnostic qui vérifie `predicate`, ou une erreur qui liste tous les diagnostics.
+    pub fn find_diagnostic(
+        &self,
+        what: &str,
+        predicate: impl Fn(&Diagnostic) -> bool,
+    ) -> Result<Diagnostic, String> {
+        let all = self.diagnostics();
+        all.iter().find(|d| predicate(d)).cloned().ok_or_else(|| {
+            let list: Vec<String> = all.iter().map(|d| format!("  {d}")).collect();
+            format!("aucun diagnostic {what} parmi :\n{}", list.join("\n"))
+        })
+    }
+
+    /// Calcule le plan ; pour un projet qui a un dossier, l'écrit aussi (ORD-011).
     pub fn compute_plan(&mut self) -> Result<(), String> {
         let result = compute_plan(&self.project, &self.profile);
         if let (Ok(plan), Some(dir)) = (&result, &self.project_dir) {
-            plan.write(dir.path()).map_err(|e| e.to_string())?;
+            plan.write(dir).map_err(|e| e.to_string())?;
         }
         self.plan = Some(result);
         Ok(())
@@ -76,6 +171,23 @@ impl World {
             .stage_of(system)
             .ok_or_else(|| format!("« {system} » ne figure dans aucune étape"))
     }
+}
+
+/// Contenu de tous les fichiers d'un dossier, par chemin relatif.
+pub fn snapshot(dir: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
+    fn walk(root: &Path, dir: &Path, out: &mut BTreeMap<PathBuf, Vec<u8>>) {
+        for entry in fs::read_dir(dir).into_iter().flatten().flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                walk(root, &path, out);
+            } else if let Ok(bytes) = fs::read(&path) {
+                out.insert(path.strip_prefix(root).unwrap().to_path_buf(), bytes);
+            }
+        }
+    }
+    let mut out = BTreeMap::new();
+    walk(dir, dir, &mut out);
+    out
 }
 
 fn copy_dir(from: &Path, to: &Path) -> std::io::Result<()> {

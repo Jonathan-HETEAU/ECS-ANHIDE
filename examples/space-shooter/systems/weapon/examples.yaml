@@ -1,0 +1,29 @@
+- id: tir
+  given:
+    Position:
+      value:
+        x: 10
+        y: 20
+    Player: {}
+  given_resources:
+    InputState:
+      thrust:
+        x: 0
+        y: 0
+      fire: true
+  expect_spawned:
+  - Bullet
+- id: sans-tir
+  given:
+    Position:
+      value:
+        x: 10
+        y: 20
+    Player: {}
+  given_resources:
+    InputState:
+      thrust:
+        x: 0
+        y: 0
+      fire: false
+  expect_spawned: []

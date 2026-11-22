@@ -1,0 +1,15 @@
+- id: dessin
+  given:
+    Position:
+      value:
+        x: 3
+        y: 4
+    Sprite:
+      image: asteroid.png
+  expect:
+    Position:
+      value:
+        x: 3
+        y: 4
+    Sprite:
+      image: asteroid.png

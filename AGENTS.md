@@ -83,11 +83,12 @@ cargo fmt --all
 | Crate | Rôle |
 |---|---|
 | `crates/spec-markdown` | Parseur et exécuteur du format Spec Markdown |
-| `crates/ecs-nide-core` | Le cœur : modèle, chargement du dossier projet, ordonnancement |
+| `crates/ecs-nide-core` | Le cœur : modèle, dossier projet (chargement, enregistrement, création), renommage et suppression, ordonnancement, contrats, validation |
 | `crates/ecs-nide-specs` | Les fonctions des étapes de `features/` et les tests de traçabilité |
 | `examples/space-shooter` | Le projet d'exemple décrit dans `features/README.md` |
 
 ## État actuel
 
-Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **en cours**. L'ordonnancement est
-fait ; la suite porte sur l'enregistrement du projet, la modélisation et la validation.
+Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **en cours**. Faits : dossier projet,
+modélisation, ordonnancement, validation, contrats. Suite : vérification des exemples et des
+propriétés (CEL), puis la CLI (phase 2).

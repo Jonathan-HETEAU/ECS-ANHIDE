@@ -1,0 +1,18 @@
+- id: poussee-droite
+  given:
+    Velocity:
+      value:
+        x: 0
+        y: 0
+    Player: {}
+  given_resources:
+    InputState:
+      thrust:
+        x: 1
+        y: 0
+      fire: false
+  expect:
+    Velocity:
+      value:
+        x: 300
+        y: 0

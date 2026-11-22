@@ -1,0 +1,18 @@
+- id: decompte
+  given:
+    Lifetime:
+      remaining: 1
+  given_resources:
+    Time:
+      delta: 0.25
+  expect:
+    Lifetime:
+      remaining: 0.75
+- id: expiration
+  given:
+    Lifetime:
+      remaining: 0.1
+  given_resources:
+    Time:
+      delta: 0.25
+  expect_despawned: true

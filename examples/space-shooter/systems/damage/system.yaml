@@ -7,9 +7,9 @@ components:
   Hit: read
   Invulnerable: without
 structural:
-  remove:
-  - Hit
   may_add:
   - Dead
+  remove:
+  - Hit
 after:
 - Collision

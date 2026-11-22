@@ -21,6 +21,7 @@ dependencies = [
  "indexmap",
  "serde",
  "serde_yaml",
+ "spec-markdown",
  "tempfile",
  "thiserror",
 ]

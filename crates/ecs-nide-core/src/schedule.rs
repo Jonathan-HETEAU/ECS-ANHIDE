@@ -415,7 +415,7 @@ fn reachable(start: usize, successors: &[Vec<usize>]) -> BTreeSet<usize> {
 
 /// Composants que peut porter une entité sélectionnée : ses composants exigés et optionnels, et
 /// ceux des archétypes déclarés qu'elle peut être.
-fn candidate_components(project: &Project, io: Io<'_>) -> BTreeSet<String> {
+pub(crate) fn candidate_components(project: &Project, io: Io<'_>) -> BTreeSet<String> {
     let required: BTreeSet<&String> = io.required().collect();
     let excluded: BTreeSet<&String> = io.excluded().collect();
     let mut set: BTreeSet<String> = io
@@ -478,6 +478,20 @@ fn direct_observers(project: &Project, observers: &[&Observer], io: Io<'_>) -> V
             },
         })
         .map(|(i, _)| i)
+        .collect()
+}
+
+/// Les observateurs que des accès et effets peuvent déclencher, directement ou en cascade, dans
+/// l'ordre de la cascade (ORD-016).
+pub fn observers_triggered(project: &Project, io: Io<'_>) -> Vec<String> {
+    let observers = project.observers_in_declaration_order();
+    let graph: Vec<Vec<usize>> = observers
+        .iter()
+        .map(|o| direct_observers(project, &observers, o.io()))
+        .collect();
+    cascade(direct_observers(project, &observers, io), &graph)
+        .into_iter()
+        .map(|o| observers[o].name.clone())
         .collect()
 }
 

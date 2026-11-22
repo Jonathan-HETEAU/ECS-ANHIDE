@@ -2,6 +2,7 @@ name: Asteroid
 components:
 - Position
 - Velocity
+- Rotation
 - Sprite
 - Collider
 - Health

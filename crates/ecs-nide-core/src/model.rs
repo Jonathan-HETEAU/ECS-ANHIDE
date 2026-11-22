@@ -73,6 +73,105 @@ pub struct Field {
     pub default: Option<Value>,
 }
 
+impl Field {
+    /// Vérifie qu'une valeur respecte le type et les contraintes du champ (MOD-002, MOD-003).
+    pub fn check(&self, value: &Value) -> Result<(), String> {
+        let number = |v: &Value| v.as_f64();
+        match self.ty.as_str() {
+            "bool" => value
+                .as_bool()
+                .map(|_| ())
+                .ok_or("un booléen est attendu")?,
+            "string" => {
+                let s = value.as_str().ok_or("une chaîne est attendue")?;
+                if let Some(max) = self.max_len
+                    && s.chars().count() as u64 > max
+                {
+                    return Err(format!("la longueur dépasse {max}"));
+                }
+            }
+            "enum" => {
+                let s = value
+                    .as_str()
+                    .ok_or("une valeur d'énumération est attendue")?;
+                if let Some(values) = &self.values
+                    && !values.iter().any(|v| v == s)
+                {
+                    return Err(format!("« {s} » n'est pas parmi {values:?}"));
+                }
+            }
+            "vec2" | "vec3" | "vec4" | "quat" => {
+                let axes: &[&str] = match self.ty.as_str() {
+                    "vec2" => &["x", "y"],
+                    "vec3" => &["x", "y", "z"],
+                    _ => &["x", "y", "z", "w"],
+                };
+                let map = value
+                    .as_mapping()
+                    .ok_or("une table { x, y, … } est attendue")?;
+                for axis in axes {
+                    map.get(*axis)
+                        .and_then(number)
+                        .ok_or_else(|| format!("composante « {axis} » absente"))?;
+                }
+            }
+            "entity" => {}
+            ty if ty.starts_with("list<") => {
+                value.as_sequence().ok_or("une liste est attendue")?;
+            }
+            ty if is_numeric(ty) => {
+                let n = number(value).ok_or("un nombre est attendu")?;
+                if is_integer(ty) && n.fract() != 0.0 {
+                    return Err("un entier est attendu".into());
+                }
+                if ty.starts_with('u') && n < 0.0 {
+                    return Err("un entier positif est attendu".into());
+                }
+                if let Some(min) = self.min.as_ref().and_then(number)
+                    && n < min
+                {
+                    return Err(format!("{n} est inférieur au minimum {min}"));
+                }
+                if let Some(max) = self.max.as_ref().and_then(number)
+                    && n > max
+                {
+                    return Err(format!("{n} est supérieur au maximum {max}"));
+                }
+            }
+            other => return Err(format!("type inconnu : {other}")),
+        }
+        Ok(())
+    }
+}
+
+/// Les types de champs indépendants du langage (MOD-002).
+pub const SCALAR_TYPES: [&str; 18] = [
+    "bool", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "string", "vec2",
+    "vec3", "vec4", "quat", "entity", "enum",
+];
+
+fn is_integer(ty: &str) -> bool {
+    matches!(
+        ty,
+        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64"
+    )
+}
+
+fn is_numeric(ty: &str) -> bool {
+    is_integer(ty) || matches!(ty, "f32" | "f64")
+}
+
+/// Vrai si `ty` est un type de champ connu, `list<T>` compris (MOD-002).
+pub fn is_known_type(ty: &str) -> bool {
+    match ty
+        .strip_prefix("list<")
+        .and_then(|rest| rest.strip_suffix('>'))
+    {
+        Some(inner) => is_known_type(inner),
+        None => SCALAR_TYPES.contains(&ty),
+    }
+}
+
 pub type Fields = IndexMap<String, Field>;
 
 /// Indication de stockage d'un composant (MOD-016).
@@ -364,6 +463,12 @@ pub struct System {
     /// Contenu de `spec.md`.
     #[serde(skip)]
     pub spec: String,
+    /// Contenu de `examples.yaml` (TST-002).
+    #[serde(skip)]
+    pub examples: Vec<Value>,
+    /// Contenu de `properties.yaml` (TST-003).
+    #[serde(skip)]
+    pub properties: Vec<Value>,
 }
 
 impl System {
@@ -386,6 +491,8 @@ impl System {
             before: Vec::new(),
             after: Vec::new(),
             spec: String::new(),
+            examples: Vec::new(),
+            properties: Vec::new(),
         }
     }
 
@@ -430,6 +537,12 @@ pub struct Observer {
     /// Contenu de `spec.md`.
     #[serde(skip)]
     pub spec: String,
+    /// Contenu de `examples.yaml` (TST-002).
+    #[serde(skip)]
+    pub examples: Vec<Value>,
+    /// Contenu de `properties.yaml` (TST-003).
+    #[serde(skip)]
+    pub properties: Vec<Value>,
 }
 
 impl Observer {
@@ -447,6 +560,8 @@ impl Observer {
             structural: Structural::default(),
             toggles: IndexMap::new(),
             spec: String::new(),
+            examples: Vec::new(),
+            properties: Vec::new(),
         }
     }
 
@@ -484,6 +599,37 @@ impl Io<'_> {
             .iter()
             .filter(|(_, a)| matches!(a, Access::Read | Access::Write | Access::With))
             .map(|(name, _)| name)
+    }
+
+    /// Vrai si une entité portant ces composants est sélectionnée (MOD-009). Chaque composant est
+    /// accompagné de son état : un composant activable désactivé compte comme absent.
+    pub fn selects(&self, entity: &[(String, bool)]) -> bool {
+        let present = |name: &String| entity.iter().any(|(n, enabled)| n == name && *enabled);
+        self.required().all(present) && !self.excluded().any(present)
+    }
+
+    /// Vrai si une entité de cet archétype, tous composants activés, est sélectionnée.
+    pub fn selects_archetype(&self, archetype: &Archetype) -> bool {
+        let entity: Vec<(String, bool)> = archetype
+            .components
+            .iter()
+            .map(|c| (c.clone(), true))
+            .collect();
+        self.selects(&entity)
+    }
+
+    /// Tous les composants cités par les accès et les effets.
+    pub fn mentioned_components(&self) -> Vec<&String> {
+        let mut names: Vec<&String> = self.components.keys().collect();
+        names.extend(self.changed);
+        names.extend(self.via.keys());
+        names.extend(self.via.values().flat_map(|c| c.keys()));
+        names.extend(self.structural.added());
+        names.extend(self.structural.removed());
+        names.extend(self.toggles.keys());
+        let mut seen = std::collections::BTreeSet::new();
+        names.retain(|n| seen.insert(*n));
+        names
     }
 
     /// Composants dont l'absence est exigée : `without` (MOD-009).

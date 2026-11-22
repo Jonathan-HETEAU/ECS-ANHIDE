@@ -1,0 +1,10 @@
+- id: isolee
+  given:
+    Position:
+      value:
+        x: 0
+        y: 0
+    Collider:
+      radius: 1
+  expect_absent:
+  - Hit

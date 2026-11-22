@@ -37,8 +37,10 @@ activable, alors ECS NIDE doit signaler une erreur.
 **VAL-010** — Si un système déclare un filtre de changement sur un composant qu'il ne déclare pas
 en `read`, `write` ou `with`, alors ECS NIDE doit signaler une erreur.
 
-**VAL-011** — Si un système déclare à la fois l'émission et la lecture d'un même canal de messages,
-alors ECS NIDE doit signaler une erreur.
+**VAL-011** — Si un fichier du projet déclare deux fois la même clé dans un même bloc (par exemple
+deux accès d'un système au même composant ou au même canal de messages), alors ECS NIDE doit
+signaler une erreur qui nomme la clé et la ligne de la seconde déclaration, et ne retenir aucune des
+deux déclarations.
 
 **VAL-012** — ECS NIDE doit signaler un avertissement pour tout canal de messages lu par au moins un
 système mais sur lequel aucun système n'émet, et pour tout canal sur lequel un système émet mais

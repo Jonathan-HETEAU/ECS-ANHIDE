@@ -5,3 +5,4 @@ per_entity: true
 components:
   Position: read
   Sprite: read
+  Rotation: optional

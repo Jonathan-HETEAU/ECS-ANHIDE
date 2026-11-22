@@ -6,6 +6,7 @@
 
 use ecs_nide_core::load::load_project;
 use ecs_nide_core::schedule::compute_plan;
+use ecs_nide_core::validate::validate;
 use ecs_nide_core::{EngineProfile, Project};
 use ecs_nide_specs::repo;
 
@@ -48,6 +49,41 @@ fn le_plan_de_l_exemple_ne_laisse_aucune_ambiguite() {
             plan.ambiguities
         );
         assert!(plan.observer_cycles.is_empty(), "profil {}", profile.name);
+    }
+}
+
+#[test]
+fn la_validation_de_l_exemple_ne_signale_rien() {
+    let project = space_shooter();
+    for profile in profiles() {
+        let diagnostics = validate(&project, &profile);
+        assert!(
+            diagnostics.is_empty(),
+            "profil {} :\n{}",
+            profile.name,
+            diagnostics
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+    }
+}
+
+#[test]
+fn chaque_systeme_de_l_exemple_a_une_specification_et_des_tests() {
+    let project = space_shooter();
+    for system in &project.systems {
+        assert!(
+            !system.spec.trim().is_empty(),
+            "{} n'a pas de spécification",
+            system.name
+        );
+        assert!(
+            !system.examples.is_empty(),
+            "{} n'a aucun exemple",
+            system.name
+        );
     }
 }
 

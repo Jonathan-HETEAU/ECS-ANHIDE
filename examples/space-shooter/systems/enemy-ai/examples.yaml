@@ -1,0 +1,16 @@
+- id: sans-cible
+  given:
+    Position:
+      value:
+        x: 0
+        y: 0
+    Velocity:
+      value:
+        x: 5
+        y: 0
+    Enemy: {}
+  expect:
+    Velocity:
+      value:
+        x: 5
+        y: 0

@@ -448,8 +448,8 @@ pub fn register(r: &mut Registry<World>) {
         |w, s| {
             let file = s.param(0)?;
             ensure(file == PLAN_FILE, || format!("fichier inattendu : {file}"))?;
-            let dir = w.project_dir.as_ref().ok_or("aucun dossier projet ouvert")?;
-            let text = fs::read_to_string(dir.path().join(file)).map_err(|e| format!("{file} : {e}"))?;
+            let dir = w.dir()?;
+            let text = fs::read_to_string(dir.join(file)).map_err(|e| format!("{file} : {e}"))?;
             let yaml: serde_yaml::Value = serde_yaml::from_str(&text).map_err(|e| e.to_string())?;
             ensure(yaml["profile"]["name"].as_str().is_some(), || "profil absent".into())?;
             ensure(yaml["ambiguities"].is_sequence(), || "ambiguïtés absentes".into())?;

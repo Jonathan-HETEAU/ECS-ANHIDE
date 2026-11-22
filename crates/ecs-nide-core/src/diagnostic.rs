@@ -15,6 +15,9 @@ pub enum Level {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Diagnostic {
     pub level: Level,
+    /// Identifiant de l'exigence qui définit ce diagnostic (`VAL-001`, `ORD-007`…).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub element: Option<String>,
@@ -28,6 +31,7 @@ impl Diagnostic {
     pub fn error(message: impl Into<String>) -> Self {
         Self {
             level: Level::Error,
+            code: None,
             message: message.into(),
             element: None,
             file: None,
@@ -40,6 +44,11 @@ impl Diagnostic {
             level: Level::Warning,
             ..Self::error(message)
         }
+    }
+
+    pub fn code(mut self, code: &str) -> Self {
+        self.code = Some(code.to_string());
+        self
     }
 
     pub fn element(mut self, element: impl Into<String>) -> Self {

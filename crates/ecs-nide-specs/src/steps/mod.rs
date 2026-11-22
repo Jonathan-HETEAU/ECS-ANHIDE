@@ -1,7 +1,9 @@
 //! Les fonctions des étapes, regroupées par domaine.
 
+mod modelisation;
 mod ordonnancement;
 mod projet;
+mod validation;
 
 use spec_markdown::Registry;
 
@@ -11,7 +13,9 @@ use crate::World;
 pub fn registry() -> Registry<World> {
     let mut registry = Registry::new();
     projet::register(&mut registry);
+    modelisation::register(&mut registry);
     ordonnancement::register(&mut registry);
+    validation::register(&mut registry);
     registry
 }
 

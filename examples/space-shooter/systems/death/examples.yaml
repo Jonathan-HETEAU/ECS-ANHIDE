@@ -1,0 +1,10 @@
+- id: un-point
+  given:
+    Dead: {}
+  given_resources:
+    GameState:
+      score: 10
+  expect_despawned: true
+  expect_resources:
+    GameState:
+      score: 11

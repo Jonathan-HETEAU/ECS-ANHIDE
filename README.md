@@ -32,6 +32,6 @@ cargo run -p ecs-nide-core --example plan -- examples/space-shooter   # plan d'e
 
 ## État
 
-Phase 0 (spécifications) terminée. Phase 1 (cœur Rust) en cours : l'ordonnancement est
-implémenté et ses scénarios passent. Voir la feuille de route dans
+Phase 0 (spécifications) terminée. Phase 1 (cœur Rust) en cours : dossier projet, modélisation,
+ordonnancement, validation et contrats sont implémentés, et leurs scénarios passent. Voir la feuille de route dans
 [`VISION.md`](VISION.md#13-feuille-de-route-proposée).

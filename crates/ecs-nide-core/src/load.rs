@@ -1,9 +1,11 @@
-//! Lecture d'un dossier projet (PRJ-005, PRJ-009).
+//! Lecture d'un dossier projet (PRJ-005, PRJ-009, VAL-011).
 
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde::de::DeserializeOwned;
+use serde_yaml::Value;
 
 use crate::diagnostic::Diagnostic;
 use crate::model::{
@@ -13,6 +15,9 @@ use crate::model::{
 
 pub const MANIFEST_FILE: &str = "ecs-nide.yaml";
 pub const SCHEDULE_FILE: &str = "schedule.yaml";
+pub const SPEC_FILE: &str = "spec.md";
+pub const EXAMPLES_FILE: &str = "examples.yaml";
+pub const PROPERTIES_FILE: &str = "properties.yaml";
 
 #[derive(Debug, thiserror::Error)]
 pub enum LoadError {
@@ -54,9 +59,10 @@ pub fn load_project(dir: &Path) -> Result<Loaded, LoadError> {
         diagnostics.push(
             Diagnostic::warning(format!(
                 "le projet utilise le format {} alors qu'ECS NIDE gère le format {} : \
-                 il est ouvert en lecture seule",
+                 il est ouvert en lecture seule et ne sera jamais réécrit",
                 manifest.format, FORMAT_VERSION
             ))
+            .code("PRJ-009")
             .at(MANIFEST_FILE, None),
         );
     }
@@ -85,7 +91,10 @@ pub fn load_project(dir: &Path) -> Result<Loaded, LoadError> {
         if let Some(mut system) =
             parse_required::<System>(dir, &sub, "system.yaml", &mut diagnostics)
         {
-            system.spec = fs::read_to_string(sub.join("spec.md")).unwrap_or_default();
+            let tests = load_tests(dir, &sub, &mut diagnostics);
+            system.spec = tests.spec;
+            system.examples = tests.examples;
+            system.properties = tests.properties;
             project.systems.push(system);
         }
     }
@@ -93,7 +102,10 @@ pub fn load_project(dir: &Path) -> Result<Loaded, LoadError> {
         if let Some(mut observer) =
             parse_required::<Observer>(dir, &sub, "observer.yaml", &mut diagnostics)
         {
-            observer.spec = fs::read_to_string(sub.join("spec.md")).unwrap_or_default();
+            let tests = load_tests(dir, &sub, &mut diagnostics);
+            observer.spec = tests.spec;
+            observer.examples = tests.examples;
+            observer.properties = tests.properties;
             project.observers.push(observer);
         }
     }
@@ -105,8 +117,114 @@ pub fn load_project(dir: &Path) -> Result<Loaded, LoadError> {
     })
 }
 
+struct Tests {
+    spec: String,
+    examples: Vec<Value>,
+    properties: Vec<Value>,
+}
+
+/// Lit la spécification, les exemples et les propriétés d'un système ou d'un observateur.
+fn load_tests(root: &Path, dir: &Path, diagnostics: &mut Vec<Diagnostic>) -> Tests {
+    let list = |file: &str, diagnostics: &mut Vec<Diagnostic>| -> Vec<Value> {
+        let path = dir.join(file);
+        if path.is_file() {
+            parse_file::<Vec<Value>>(root, &path, diagnostics).unwrap_or_default()
+        } else {
+            Vec::new()
+        }
+    };
+    Tests {
+        spec: fs::read_to_string(dir.join(SPEC_FILE)).unwrap_or_default(),
+        examples: list(EXAMPLES_FILE, diagnostics),
+        properties: list(PROPERTIES_FILE, diagnostics),
+    }
+}
+
 fn relative(root: &Path, path: &Path) -> PathBuf {
     path.strip_prefix(root).unwrap_or(path).to_path_buf()
+}
+
+/// Analyse un texte YAML en `T`. Une clé déclarée deux fois dans un même bloc est une erreur
+/// (VAL-011) : sans cette vérification, la dernière déclaration écraserait silencieusement la
+/// première.
+pub fn parse_yaml<T: DeserializeOwned>(text: &str, file: &Path) -> Result<T, Diagnostic> {
+    if let Err(err) = serde_yaml::from_str::<Value>(text) {
+        let message = err.to_string();
+        if message.contains("duplicate entry") {
+            let (key, line) = find_duplicate_key(text)
+                .unwrap_or_else(|| (String::new(), err.location().map_or(0, |l| l.line())));
+            return Err(Diagnostic::error(format!(
+                "la clé « {key} » est déclarée deux fois dans le même bloc"
+            ))
+            .code("VAL-011")
+            .at(file, (line > 0).then_some(line)));
+        }
+        return Err(syntax_error(&err, file));
+    }
+    serde_yaml::from_str::<T>(text).map_err(|err| syntax_error(&err, file))
+}
+
+fn syntax_error(err: &serde_yaml::Error, file: &Path) -> Diagnostic {
+    Diagnostic::error(format!("fichier invalide : {err}"))
+        .code("PRJ-005")
+        .at(file, err.location().map(|l| l.line()))
+}
+
+/// Trouve la première clé déclarée deux fois dans un même bloc YAML, avec la ligne (à partir de
+/// 1) de sa seconde déclaration. Seuls les blocs en style « bloc » sont examinés.
+pub fn find_duplicate_key(text: &str) -> Option<(String, usize)> {
+    // Pile des blocs ouverts : (indentation, clés déjà vues).
+    let mut stack: Vec<(usize, HashSet<String>)> = Vec::new();
+    for (index, raw) in text.lines().enumerate() {
+        let trimmed = raw.trim_start();
+        if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with("---") {
+            continue;
+        }
+        let mut indent = raw.len() - trimmed.len();
+        let mut content = trimmed;
+        if let Some(rest) =
+            content
+                .strip_prefix("- ")
+                .or(if content == "-" { Some("") } else { None })
+        {
+            // Un élément de liste ouvre un nouveau bloc, plus indenté de deux colonnes.
+            while stack.last().is_some_and(|(i, _)| *i > indent) {
+                stack.pop();
+            }
+            indent += 2;
+            content = rest.trim_start();
+            if let Some(key) = mapping_key(content) {
+                stack.push((indent, HashSet::from([key])));
+            }
+            continue;
+        }
+        let Some(key) = mapping_key(content) else {
+            continue;
+        };
+        while stack.last().is_some_and(|(i, _)| *i > indent) {
+            stack.pop();
+        }
+        match stack.last_mut() {
+            Some((i, keys)) if *i == indent => {
+                if !keys.insert(key.clone()) {
+                    return Some((key, index + 1));
+                }
+            }
+            _ => stack.push((indent, HashSet::from([key]))),
+        }
+    }
+    None
+}
+
+fn mapping_key(content: &str) -> Option<String> {
+    if content.starts_with(['{', '[', '"', '\'', '|', '>']) {
+        return None;
+    }
+    let end = content
+        .find(": ")
+        .or_else(|| content.strip_suffix(':').map(str::len))?;
+    let key = content[..end].trim();
+    (!key.is_empty()).then(|| key.to_string())
 }
 
 fn parse_file<T: DeserializeOwned>(
@@ -123,11 +241,10 @@ fn parse_file<T: DeserializeOwned>(
             return None;
         }
     };
-    match serde_yaml::from_str::<T>(&text) {
+    match parse_yaml(&text, &rel) {
         Ok(value) => Some(value),
-        Err(err) => {
-            let line = err.location().map(|l| l.line());
-            diagnostics.push(Diagnostic::error(format!("fichier invalide : {err}")).at(rel, line));
+        Err(diagnostic) => {
+            diagnostics.push(diagnostic);
             None
         }
     }
@@ -209,6 +326,30 @@ mod tests {
     }
 
     #[test]
+    fn val_011_detection_des_cles_en_double() {
+        assert_eq!(
+            find_duplicate_key("a: 1\nb: 2\na: 3\n"),
+            Some(("a".into(), 3))
+        );
+        assert_eq!(find_duplicate_key("x:\n  a: 1\ny:\n  a: 2\n"), None);
+        assert_eq!(
+            find_duplicate_key("- id: a\n  v: 1\n- id: b\n  v: 2\n"),
+            None
+        );
+        assert_eq!(
+            find_duplicate_key("- id: a\n  v: 1\n  v: 2\n"),
+            Some(("v".into(), 3))
+        );
+        assert_eq!(
+            find_duplicate_key(
+                "components:\n  Position: read\nresources:\n  Time: read\n  Time: write\n"
+            ),
+            Some(("Time".into(), 5))
+        );
+        assert_eq!(find_duplicate_key("a:\n- x\n- y\nb: 1\n"), None);
+    }
+
+    #[test]
     fn le_projet_d_exemple_se_charge_sans_diagnostic() {
         let loaded = load_project(&space_shooter()).unwrap();
         assert!(loaded.diagnostics.is_empty(), "{:#?}", loaded.diagnostics);
@@ -259,6 +400,38 @@ mod tests {
         let loaded = load_project(tmp.path()).unwrap();
         assert_eq!(loaded.diagnostics.len(), 1);
         assert_eq!(loaded.diagnostics[0].line, Some(2));
+    }
+
+    #[test]
+    fn val_011_une_cle_en_double_est_signalee_et_non_ecrasee() {
+        let tmp = tempfile::tempdir().unwrap();
+        copy_dir(&space_shooter(), tmp.path());
+        fs::write(
+            tmp.path().join("systems/movement/system.yaml"),
+            "name: Movement\ncomponents:\n  Position: read\n  Velocity: read\n  Position: write\n",
+        )
+        .unwrap();
+        let loaded = load_project(tmp.path()).unwrap();
+        let duplicate = loaded
+            .diagnostics
+            .iter()
+            .find(|d| d.code.as_deref() == Some("VAL-011"))
+            .unwrap_or_else(|| panic!("aucune erreur VAL-011 : {:#?}", loaded.diagnostics));
+        assert_eq!(duplicate.level, Level::Error);
+        assert!(
+            duplicate.message.contains("Position"),
+            "{}",
+            duplicate.message
+        );
+        assert_eq!(
+            duplicate.file.as_deref(),
+            Some(Path::new("systems/movement/system.yaml"))
+        );
+        assert_eq!(duplicate.line, Some(5));
+        assert!(
+            loaded.project.system("Movement").is_none(),
+            "le fichier invalide ne doit pas être retenu"
+        );
     }
 
     #[test]

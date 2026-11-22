@@ -185,8 +185,16 @@ Propriétés : sante-positive
   expect_absent: [Hit]
 ```
 
-Un exemple peut aussi décrire les messages reçus (`given_messages`) et l'état des composants
-activables (`disabled` en entrée, `expect_disabled` et `expect_enabled` en sortie).
+Un exemple peut aussi décrire :
+
+| Clé | Sens |
+|---|---|
+| `given_resources` / `expect_resources` | les ressources lues avant, et écrites après |
+| `given_messages` / `expect_messages` | les messages reçus avant, et émis après |
+| `disabled` / `expect_disabled` / `expect_enabled` | l'état des composants activables |
+| `expect_absent` | les composants retirés |
+| `expect_spawned` | les archétypes des entités créées |
+| `expect_despawned` | `true` si l'entité est détruite |
 
 ### 6.4 Les tests par propriétés : `properties.yaml`
 
@@ -439,7 +447,7 @@ les `spec.md` des systèmes dans l'IDE.
 | Phase | Contenu |
 |---|---|
 | 0 | Spécifications (ce document, `features/`, `exigences/`) **validées** — terminée |
-| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — en cours (ordonnancement fait) |
+| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — en cours (dossier projet, modélisation, ordonnancement, validation et contrats faits) |
 | 2 | CLI `ecs-nide` : `validate`, `plan`, `contract` |
 | 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés |
 | 4 | Serveur MCP + génération de `AGENTS.md` et `.vscode/mcp.json` |

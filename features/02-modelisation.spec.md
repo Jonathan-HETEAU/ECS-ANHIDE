@@ -104,13 +104,14 @@ Exigences : MOD-016
 * Déclarer le composant "Hit" avec le stockage "sparse"
 * Déclarer le composant "Position" sans indication de stockage
 * Le stockage de "Hit" est "sparse" et celui de "Position" est "dense"
+* Déclarer le système "Damage" qui lit le composant "Hit"
 * Le contrat de "Damage" indique le stockage "sparse" pour "Hit"
 
 ## Un canal de messages transporte des données typées
 Exigences : MOD-017, MOD-018
 * Déclarer le canal de messages "Explosion" avec les champs "position" de type "vec2" et "radius" de type "f32"
 * Déclarer le système "Collision" qui peut émettre sur "Explosion"
-* Déclarer le système "Sfx" qui lit "Explosion"
+* Déclarer le système "Sfx" qui lit le canal "Explosion"
 * Le contrat de "Collision" indique l'émission possible sur "Explosion"
 * Le contrat de "Sfx" indique la lecture de "Explosion" et contient le schéma de "Explosion"
 

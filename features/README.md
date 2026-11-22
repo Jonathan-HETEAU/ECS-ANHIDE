@@ -56,7 +56,8 @@ scénarios.
 Ce projet joue le rôle d'un utilisateur d'ECS NIDE, et il doit être **exemplaire** : ses choix de
 conception sont les plus sensés possible, et il ne laisse aucune décision en suspens. Le test
 `crates/ecs-nide-specs/tests/exemple.rs` le vérifie : aucun diagnostic, aucune ambiguïté quel que
-soit le profil du moteur, une phase pour chaque système, et le rendu seul en fin de boucle.
+soit le profil du moteur, une phase pour chaque système, une spécification et au moins un exemple
+pour chaque système, et le rendu seul en fin de boucle.
 
 **Composants** : `Position` (vec2), `Velocity` (vec2), `Rotation` (f32), `Sprite`, `Collider` (radius),
 `Health` (current, max), `Hit` (amount), `Lifetime` (remaining), `Target` (entity), et les marqueurs
@@ -68,8 +69,8 @@ soit le profil du moteur, une phase pour chaque système, et le rendu seul en fi
 
 | archétype | composants |
 |---|---|
-| Player   | Position, Velocity, Sprite, Collider, Health, Player |
-| Asteroid | Position, Velocity, Sprite, Collider, Health, Enemy |
+| Player   | Position, Velocity, Rotation, Sprite, Collider, Health, Player |
+| Asteroid | Position, Velocity, Rotation, Sprite, Collider, Health, Enemy |
 | Bullet   | Position, Velocity, Sprite, Collider, Lifetime |
 | Particle | Position, Velocity, Lifetime |
 
@@ -87,7 +88,7 @@ soit le profil du moteur, une phase pour chaque système, et le rendu seul en fi
 | Damage | Resolution | write Health, read Hit, without Invulnerable | retire Hit ; peut ajouter Dead | après Collision |
 | Lifetime | Resolution | write Lifetime, read `Time`ᴿ | peut détruire | |
 | Death | Resolution | with Dead, write `GameState`ᴿ | détruit | après Damage |
-| Render | Rendu | read Position, read Sprite | | |
+| Render | Rendu | read Position, read Sprite, optional Rotation | | |
 
 ᴿ = ressource.
 
