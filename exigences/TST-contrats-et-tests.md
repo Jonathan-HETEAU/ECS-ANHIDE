@@ -48,8 +48,9 @@ signaler comme incomplètes les parties restant à compléter.
 spécification ; ses accès aux composants, ressources et canaux de messages ; ses filtres de
 changement ; ses changements structurels ; ses activations et désactivations ; ses contraintes
 d'ordre ; sa phase ; sa fréquence ; son attribut `per_entity` ; les schémas et indications de
-stockage des seuls composants, ressources et canaux qu'il utilise ; ses exemples ; ses propriétés ;
-le profil et la référence au skill du moteur cible.
+stockage des seuls composants, ressources, canaux, événements et relations qu'il utilise ; ses
+déclenchements d'événements et les observateurs qu'il peut déclencher ; ses exemples ; ses
+propriétés ; le profil et la référence au skill du moteur cible.
 
 **TST-014** — Quand un rapport de résultats de tests au format JUnit XML est importé, ECS NIDE doit
 associer chaque test à son système et à son exemple ou sa propriété d'après la convention de
@@ -57,3 +58,7 @@ nommage `ecsnide::<Système>::example::<id>` ou `ecsnide::<Système>::property::
 
 **TST-015** — Si un résultat d'un rapport importé ne correspond à aucun système, exemple ou
 propriété du projet, alors ECS NIDE doit le signaler et poursuivre l'import des autres résultats.
+
+**TST-016** — ECS NIDE doit appliquer aux observateurs les mêmes spécifications, exemples,
+propriétés, vérifications de cohérence et contrats qu'aux systèmes, l'entrée d'un exemple
+d'observateur comprenant en plus l'événement qui le déclenche.

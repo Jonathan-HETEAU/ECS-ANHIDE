@@ -84,3 +84,20 @@ Exigences : VAL-013
 * Le profil du moteur cible ne prend pas en charge les composants activables
 * Le projet déclare le composant activable "Stunned"
 * La validation signale que les composants activables ne sont pas pris en charge par le moteur cible et renvoie à son skill
+
+## Un observateur que rien ne déclenche est signalé
+Exigences : VAL-014
+* L'observateur "OnFreeze" réagit à l'ajout de "Frozen"
+* Aucun système ni observateur ne peut ajouter "Frozen", et aucun archétype ne le contient
+* La validation signale que "OnFreeze" ne peut jamais être déclenché
+
+## Un événement que personne n'observe est signalé
+Exigences : VAL-015
+* Le système "Collision" peut déclencher l'événement "Damaged"
+* Aucun observateur ne réagit à "Damaged"
+* La validation signale que "Damaged" est déclenché mais jamais observé
+
+## Un accès via une relation exige de sélectionner sa source
+Exigences : VAL-016
+* Le système "Follow" lit "GlobalTransform" via "ChildOf" sans sélectionner "ChildOf"
+* La validation signale que "Follow" doit sélectionner "ChildOf" pour lire via cette relation

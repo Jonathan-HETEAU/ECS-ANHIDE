@@ -5,8 +5,8 @@ combinaisons de composants obtenues en leur appliquant, de proche en proche, les
 (certains ou possibles) des systèmes qui les sélectionnent.
 
 **VAL-001** — ECS NIDE doit signaler comme erreur tout nom en double et toute référence à un
-composant, une ressource, un canal de messages, un archétype, une phase, un système, un exemple ou
-une propriété inexistant.
+composant, une ressource, un canal de messages, un événement, une relation, un archétype, une
+phase, un système, un observateur, un exemple ou une propriété inexistant.
 
 **VAL-002** — ECS NIDE doit signaler un avertissement pour tout composant déclaré en `read`,
 `write` ou `with` par un système, qui n'appartient à aucun archétype et n'est ajouté par aucun
@@ -15,8 +15,9 @@ système.
 **VAL-003** — ECS NIDE doit signaler un avertissement pour tout système qui ne sélectionne aucun
 archétype atteignable.
 
-**VAL-004** — ECS NIDE doit signaler un avertissement pour tout composant, ressource ou canal de
-messages déclaré mais utilisé par aucun système ni aucun archétype.
+**VAL-004** — ECS NIDE doit signaler un avertissement pour tout composant, ressource, canal de
+messages, événement ou relation déclaré mais utilisé par aucun système, aucun observateur ni aucun
+archétype.
 
 **VAL-005** — ECS NIDE doit signaler un avertissement pour tout système dont la spécification est
 vide, et pour tout système qui n'a aucun exemple ni aucune propriété.
@@ -45,3 +46,13 @@ qu'aucun système ne lit.
 
 **VAL-013** — Si le projet utilise un concept que le profil du moteur cible ne prend pas en charge,
 alors ECS NIDE doit signaler un avertissement qui nomme le concept et renvoie au skill du moteur.
+
+**VAL-014** — ECS NIDE doit signaler un avertissement pour tout observateur que rien ne peut
+déclencher : aucun système ni observateur ne déclenche son événement, ou aucun ne peut produire
+l'événement de cycle de vie qu'il observe.
+
+**VAL-015** — ECS NIDE doit signaler un avertissement pour tout événement déclenché par un système
+ou un observateur mais observé par aucun observateur.
+
+**VAL-016** — Si un système ou un observateur déclare un accès `via` sur une relation dont il ne
+sélectionne pas le composant source, alors ECS NIDE doit signaler une erreur.

@@ -57,3 +57,27 @@ ECS NIDE doit appliquer le changement immédiatement, sans changer l'archétype 
 **SIM-016** — Pendant la simulation, ECS NIDE doit présenter à un système doté d'un filtre de
 changement uniquement les entités dont un composant filtré a été ajouté ou écrit depuis le
 précédent passage de ce système, toutes les entités étant présentées lors de son premier passage.
+
+**SIM-017** — Quand le point de synchronisation de fin d'étape applique des changements
+structurels et des déclenchements d'événements, ECS NIDE doit exécuter les observateurs concernés
+dans l'ordre des déclenchements et, pour un même déclenchement, dans l'ordre de déclaration des
+observateurs, puis appliquer leurs propres effets de la même façon, jusqu'à ce qu'aucun nouvel
+observateur ne soit déclenché.
+
+**SIM-018** — Si une cascade d'observateurs dépasse 64 générations au cours d'un même point de
+synchronisation, alors ECS NIDE doit arrêter la cascade, mettre la simulation en pause et signaler
+la chaîne d'observateurs en cause.
+
+**SIM-019** — Quand une entité cible d'une relation à destruction liée est détruite, ECS NIDE doit
+détruire ses entités sources au même point de synchronisation, de proche en proche.
+
+**SIM-020** — Quand une relation est ajoutée à une entité source ou retirée d'elle, ECS NIDE doit
+mettre à jour le composant cible de l'entité cible au même point de synchronisation, et retirer ce
+composant cible lorsqu'il ne liste plus aucune entité.
+
+**SIM-021** — Quand un événement d'entité propagé est déclenché, ECS NIDE doit le présenter aux
+observateurs pour l'entité visée, puis pour sa cible par la relation de propagation, de proche en
+proche jusqu'à une entité sans cible.
+
+**SIM-022** — Quand ECS NIDE crée une entité d'un archétype qui déclare des entités liées, il doit
+créer aussi ces entités, reliées à la nouvelle entité par la relation déclarée.

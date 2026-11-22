@@ -60,7 +60,10 @@ Quand elle revient au point de départ, une frame s'est écoulée.
 | **Composant** | Une donnée typée attachée à une entité. Sans champ, c'est un **marqueur** (un tag). Un composant **activable** s'active ou se désactive sans changement structurel. |
 | **Ressource** | Une donnée globale unique (le temps, les entrées clavier, la configuration…). |
 | **Canal de messages** | Un flux de données typées, émises par des systèmes et lues par d'autres pendant la même boucle, puis effacées à la fin de la boucle. |
+| **Événement** | Un fait ponctuel, éventuellement attaché à une entité, déclenché par un système ou un observateur. Un événement d'entité peut se propager le long d'une relation. |
+| **Relation** | Un lien entre entités, à la façon de Bevy : un composant source (`ChildOf`) désigne une entité cible, dont le composant cible (`Children`) liste les sources, tenu à jour automatiquement. |
 | **Système** | Une règle qui s'applique à toutes les entités qu'il sélectionne, à chaque boucle. |
+| **Observateur** | Une réaction à un déclencheur : un événement, ou l'ajout, l'insertion, le remplacement, le retrait ou la destruction d'un composant. Il s'exécute au point de synchronisation de fin d'étape, donc toujours dans la boucle. |
 | **Archétype** | Une combinaison de composants, accompagnée d'un volume estimé d'entités. |
 | **Phase** | Une grande section facultative de la boucle (entrées, logique, rendu…), dessinée comme un secteur de l'orbite. |
 | **Étape** | Un groupe de systèmes sans conflit entre eux, exécutés en parallèle. |
@@ -116,6 +119,20 @@ after: [Collision]       # contrainte d'ordre
 - **`per_entity`** : vrai si le système traite chaque entité indépendamment des autres. L'IA sait
   alors qu'elle peut répartir ses entités entre tous les cœurs. Faux par défaut.
 - **`phase`** et **`every`** : la phase du système et sa fréquence.
+
+Un **observateur** se décrit exactement de la même façon, dans `observers/<nom>/`, avec un
+`observer.yaml` qui ajoute son déclencheur :
+
+```yaml
+name: ScoreOnDeath
+on: { lifecycle: add, component: Dead }   # ou { event: EnemyKilled }
+components:
+  Enemy: with
+resources:
+  GameState: write
+triggers:
+  EnemyKilled: may_trigger
+```
 
 ### 6.2 La spécification : `spec.md`
 
@@ -194,8 +211,11 @@ asteroides/
 ├── components/            # un fichier YAML par composant
 ├── resources/             # un fichier YAML par ressource
 ├── messages/              # un fichier YAML par canal de messages
+├── events/                # un fichier YAML par événement
+├── relationships/         # un fichier YAML par relation
 ├── archetypes/            # un fichier YAML par archétype
 ├── systems/               # un dossier par système (voir § 6)
+├── observers/             # un dossier par observateur (voir § 6)
 ├── skills/<moteur>/       # skills du moteur cible (SKILL.md) et son profil (profile.yaml)
 ├── AGENTS.md              # instructions pour les IA (généré)
 └── .vscode/mcp.json       # démarre le serveur MCP depuis VS Code (généré)
@@ -222,6 +242,25 @@ fields:
   remaining: { type: f32, min: 0, default: 0 }
 ```
 
+Une relation, à la façon de Bevy :
+
+```yaml
+name: ChildOf
+target_component: Children   # liste des entités sources, tenue à jour automatiquement
+linked_spawn: true           # détruire la cible détruit ses sources
+fields: {}                   # la relation peut porter des données
+```
+
+Un système lit les composants de la cible d'une relation avec un accès `via` :
+
+```yaml
+components:
+  ChildOf: read
+  GlobalTransform: write
+via:
+  ChildOf: { GlobalTransform: read }
+```
+
 L'ordre de référence et les phases :
 
 ```yaml
@@ -235,6 +274,15 @@ Un archétype :
 name: Asteroid
 components: [Position, Velocity, Health, Collider, Enemy]
 estimated_count: 50000
+```
+
+Un archétype peut créer des entités liées, comme `children!` dans Bevy :
+
+```yaml
+name: Car
+components: [Position, Velocity]
+related:
+  - { relationship: ChildOf, archetype: Wheel, count: 4 }
 ```
 
 ## 8. L'ordonnancement
@@ -267,6 +315,10 @@ estimated_count: 50000
   ECS NIDE les ordonne alors selon l'ordre de déclaration.
 - **Changements structurels différés.** Les ajouts, retraits, créations et destructions sont
   appliqués à la fin de l'étape. Les activations et désactivations, elles, sont immédiates.
+- **Observateurs au point de synchronisation.** Les observateurs n'occupent aucune étape. Ils
+  s'exécutent au point de synchronisation de fin d'étape, dans un ordre déterministe, en cascade
+  jusqu'à stabilité. Le plan indique, pour chaque étape, les observateurs qu'elle peut déclencher,
+  et une cascade circulaire possible est signalée.
 - Le plan est **déterministe** et exporté dans `schedule.plan.yaml` pour les outils externes.
 
 ## 9. Simulation et débogage
@@ -286,6 +338,10 @@ estimated_count: 50000
 - Un système de fréquence N ne s'exécute que lors des boucles 0, N, 2N…
 - Un système doté d'un filtre de changement ne voit que les entités modifiées depuis son précédent
   passage.
+- À chaque fin d'étape, les observateurs réagissent en cascade aux changements et aux événements.
+  Une cascade de plus de 64 générations est interrompue et signalée.
+- Les relations se tiennent à jour toutes seules, la destruction d'une cible détruit ses sources
+  quand la relation le demande, et un événement d'entité peut remonter le long d'une relation.
 - On dispose du pas à pas (une étape ou une boucle), du retour en arrière, des points d'arrêt,
   de l'activation et de la désactivation de systèmes, et de la modification d'une entité pendant
   la pause.
@@ -326,6 +382,10 @@ estimated_count: 50000
   transformer exemples et propriétés en tests (par exemple avec `proptest` pour Bevy), comment
   produire le rapport de résultats et comment intégrer la sonde de débogage. Ils fournissent aussi
   le **profil du moteur** (`profile.yaml`).
+- **Bevy est le premier moteur cible.** Son profil prend en charge le parallélisme entre systèmes,
+  les ensembles disjoints, les filtres de changement, la fréquence, les observateurs et les
+  relations. Il ne prend pas en charge les composants activables, et le skill Bevy indique
+  l'équivalent à utiliser.
 - **Rapports de tests.** Le format neutre est **CTRF** (JSON avec un schéma normatif), avec des
   champs d'extension d'ECS NIDE : système, type de test, identifiant, contre-exemple, graine.
   **JUnit XML** est accepté aussi, grâce à la convention de nommage
@@ -400,12 +460,9 @@ Elles s'appuient sur l'étude des principaux moteurs ECS :
 | Rendu | **PixiJS v8** (WebGPU si disponible, sinon WebGL 2), validé par un prototype mesuré |
 | Langue | Interface **internationalisée** (Paraglide JS), français en référence ; fichiers générés dans la langue du projet, l'anglais par défaut |
 | Nouveaux concepts | Composants **activables**, filtre **`changed`**, **phases**, **fréquence** (`every`), indication de **stockage** |
+| Observateurs et relations | **Comme Bevy** : événements, observateurs (exécutés au point de synchronisation de fin d'étape), relations avec composant cible tenu à jour, destruction liée, accès `via`, entités liées des archétypes |
+| Premier moteur cible | **Bevy** : skills, profil et sonde de débogage |
 
 ### Questions encore ouvertes
 
-- **Observateurs** : s'ils deviennent nécessaires, les modéliser comme des réactions à un
-  changement structurel, exécutées au point de synchronisation de fin d'étape ?
-- **Relations entre entités** (hiérarchies, liens) : le type de champ `entity` suffit pour
-  l'instant. Faut-il un concept dédié, comme chez Flecs et Bevy ?
-- **Premier moteur cible** : Bevy est proposé.
 - **Points à vérifier** dans les documentations officielles : ceux marqués ⚠ dans l'étude.

@@ -121,3 +121,50 @@ Exigences : SIM-016
 * Pendant la pause, modifier "Collider.radius" de "A"
 * Exécuter une boucle
 * "RebuildBounds" a traité "A" et n'a pas traité "B"
+
+## Les observateurs s'exécutent au point de synchronisation, en cascade
+Exigences : SIM-017
+* "Damage" ajoute toujours "Dead"
+* L'observateur "ScoreOnDeath" réagit à l'ajout de "Dead" et déclenche toujours "EnemyKilled"
+* L'observateur "Achievements" réagit à "EnemyKilled"
+* Exécuter l'étape de "Damage" sur une entité
+* À la fin de l'étape, "ScoreOnDeath" puis "Achievements" ont été exécutés, dans cet ordre
+* Aucun système de l'étape suivante n'a été exécuté avant eux
+
+## Une cascade infinie d'observateurs est interrompue
+Exigences : SIM-018
+* L'observateur "A" réagit à "Ping" et déclenche toujours "Pong"
+* L'observateur "B" réagit à "Pong" et déclenche toujours "Ping"
+* Un système déclenche toujours "Ping"
+* Exécuter son étape
+* La cascade s'arrête après "64" générations
+* La simulation est en pause et signale la chaîne "A → B"
+
+## Détruire une cible détruit ses entités liées
+Exigences : SIM-019
+* La relation "ChildOf" a la destruction liée
+* L'entité "voiture" est la cible de "4" roues, et chaque roue est la cible d'un "boulon"
+* Un système détruit l'entité "voiture"
+* À la fin de l'étape, la voiture, les "4" roues et les "4" boulons sont détruits
+
+## Le composant cible d'une relation se tient à jour
+Exigences : SIM-020
+* L'entité "roue" reçoit "ChildOf" vers l'entité "voiture"
+* À la fin de l'étape, "Children" de "voiture" liste "roue"
+* L'entité "roue" perd "ChildOf"
+* À la fin de l'étape, "voiture" ne possède plus "Children"
+
+## Un événement d'entité remonte le long de sa relation
+Exigences : SIM-021
+* L'événement "Clicked" se propage le long de "ChildOf"
+* "bouton" a pour cible "panneau", qui a pour cible "fenetre"
+* L'observateur "OnClick" réagit à "Clicked"
+* Déclencher "Clicked" sur "bouton"
+* "OnClick" a été exécuté pour "bouton", puis "panneau", puis "fenetre"
+
+## Peupler un archétype crée ses entités liées
+Exigences : SIM-022
+* L'archétype "Car" crée "4" entités "Wheel" reliées par "ChildOf"
+* Peupler la simulation avec "2" entités "Car"
+* Il existe "2" voitures et "8" roues
+* Chaque roue a pour cible par "ChildOf" l'une des voitures, et chaque voiture a "4" roues

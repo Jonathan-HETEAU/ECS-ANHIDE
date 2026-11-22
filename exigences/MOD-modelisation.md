@@ -33,7 +33,7 @@ aucun de ceux qu'il déclare en `without`, un composant activable désactivé co
 unique, composé d'une liste de composants et doté d'un volume estimé d'entités.
 
 **MOD-011** — Quand l'utilisateur renomme un composant, une ressource, un canal de messages, un
-archétype, une phase ou un système, ECS NIDE doit mettre à jour toutes ses références dans le
+événement, une relation, un archétype, une phase, un système ou un observateur, ECS NIDE doit mettre à jour toutes ses références dans le
 projet, y compris dans les exemples, les propriétés et les spécifications.
 
 **MOD-012** — Si l'utilisateur demande la suppression d'un élément référencé ailleurs dans le
@@ -67,3 +67,35 @@ phases, et de rattacher chaque système à l'une d'elles.
 
 **MOD-021** — ECS NIDE doit permettre de déclarer pour chaque système une fréquence `every`,
 entier N supérieur ou égal à 1 signifiant « une boucle sur N », la valeur par défaut étant 1.
+
+**MOD-022** — ECS NIDE doit permettre de déclarer des événements, chacun identifié par un nom
+unique, doté de champs typés et qualifié d'événement d'entité lorsqu'il vise une entité.
+
+**MOD-023** — ECS NIDE doit permettre à un système ou à un observateur de déclarer qu'il déclenche
+(`trigger`) ou peut déclencher (`may_trigger`) un événement.
+
+**MOD-024** — ECS NIDE doit permettre de déclarer des observateurs, chacun identifié par un nom
+unique, décrit comme un système par un contrat, une spécification, des exemples et des propriétés,
+et réagissant à un seul déclencheur : un événement déclaré, ou un événement de cycle de vie (`add`,
+`insert`, `replace`, `remove`, `despawn`) d'un composant donné.
+
+**MOD-025** — ECS NIDE doit permettre à un observateur de déclarer, comme un système, ses accès aux
+composants de l'entité visée, aux ressources et aux canaux de messages, ses changements
+structurels, ses activations et désactivations, et ses déclenchements d'événements.
+
+**MOD-026** — ECS NIDE doit permettre de déclarer des relations, chacune composée d'un composant
+source, qui désigne une entité cible et peut porter des champs, et d'un composant cible, tenu à
+jour automatiquement, qui liste les entités sources.
+
+**MOD-027** — ECS NIDE doit permettre de déclarer qu'une relation détruit ses entités sources
+lorsque leur entité cible est détruite (`linked_spawn`).
+
+**MOD-028** — ECS NIDE doit permettre à un système ou à un observateur de déclarer des accès en
+lecture aux composants de l'entité cible d'une relation dont l'entité sélectionnée est source
+(`via`).
+
+**MOD-029** — ECS NIDE doit permettre de déclarer qu'un archétype crée avec chacune de ses entités
+un nombre fixé d'entités d'un autre archétype, reliées à elle par une relation donnée.
+
+**MOD-030** — ECS NIDE doit permettre de déclarer qu'un événement d'entité se propage le long d'une
+relation, de l'entité source vers son entité cible.

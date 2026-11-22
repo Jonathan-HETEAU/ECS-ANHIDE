@@ -167,3 +167,26 @@ Exigences : ORD-014
 * Calculer le plan d'exécution
 * Chaque étape contient exactement un système
 * Les systèmes se succèdent dans l'ordre résolu
+
+## Les observateurs n'occupent aucune étape
+Exigences : ORD-016
+* Le système "Damage" peut ajouter "Dead"
+* L'observateur "ScoreOnDeath" réagit à l'ajout de "Dead" et peut déclencher l'événement "EnemyKilled"
+* L'observateur "Achievements" réagit à l'événement "EnemyKilled"
+* Calculer le plan d'exécution
+* Aucune étape ne contient "ScoreOnDeath" ni "Achievements"
+* Le plan indique que l'étape de "Damage" peut déclencher "ScoreOnDeath" puis "Achievements"
+
+## Une cascade circulaire d'observateurs est signalée
+Exigences : ORD-017
+* L'observateur "A" réagit à l'événement "Ping" et peut déclencher "Pong"
+* L'observateur "B" réagit à l'événement "Pong" et peut déclencher "Ping"
+* Calculer le plan d'exécution
+* Un avertissement nomme le cycle d'observateurs "A → B → A"
+
+## Une lecture via une relation compte comme une lecture
+Exigences : ORD-003
+* Le système "PropagateTransform" lit "GlobalTransform" via "ChildOf" et écrit "Transform"
+* Le système "Physics" écrit "GlobalTransform"
+* Calculer le plan d'exécution
+* "PropagateTransform" et "Physics" sont dans des étapes différentes

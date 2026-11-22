@@ -7,7 +7,7 @@ l'IDE, le serveur MCP, la CLI et les outils externes lisent et écrivent les mê
 Exigences : PRJ-001, PRJ-002, MCP-008
 * Créer le projet "Asteroides" dans un dossier vide
 * Le dossier contient les fichiers "ecs-nide.yaml", "schedule.yaml", "AGENTS.md" et ".vscode/mcp.json"
-* Le dossier contient les répertoires "components", "resources", "messages", "archetypes", "systems" et "skills"
+* Le dossier contient les répertoires "components", "resources", "messages", "events", "relationships", "archetypes", "systems", "observers" et "skills"
 * La validation du projet ne signale aucune erreur
 
 ## Un projet rouvert est identique au projet enregistré

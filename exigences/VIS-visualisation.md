@@ -37,3 +37,9 @@ qui émet sur ce canal vers chaque planète qui le lit.
 
 **VIS-012** — L'IDE doit tirer tous les textes de son interface de catalogues de traduction, le
 catalogue français étant la référence et devant être complet.
+
+**VIS-013** — L'IDE doit représenter chaque observateur par une lune en orbite autour de chaque
+planète dont le système peut le déclencher, directement ou en cascade.
+
+**VIS-014** — L'IDE doit représenter les relations entre archétypes par des liens entre leurs
+flottes, et afficher les entités liées dans le panneau d'une flotte.

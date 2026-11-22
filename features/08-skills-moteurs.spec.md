@@ -24,6 +24,9 @@ Exigences : SKL-003
   | indication de stockage                       |
   | ressource                                    |
   | canal de messages                            |
+  | événement                                    |
+  | observateur                                  |
+  | relation et accès via                        |
   | accès read, write, optional, with, without   |
   | filtre de changement                         |
   | changements structurels                      |
@@ -71,10 +74,20 @@ Exigences : SKL-008
   | composants activables             |
   | filtres de changement             |
   | fréquence des systèmes            |
+  | observateurs                      |
+  | relations                         |
 
 ## Sans moteur cible, le profil générique s'applique
 Exigences : SKL-009
 * Créer le projet "Asteroides" sans choisir de moteur cible
 * Le profil utilisé prend en charge le parallélisme entre systèmes
 * Le profil utilisé ne prend pas en charge les ensembles disjoints
-* Le profil utilisé prend en charge les composants activables, les filtres de changement et la fréquence
+* Le profil utilisé prend en charge les composants activables, les filtres de changement, la fréquence, les observateurs et les relations
+
+## Bevy est le premier moteur cible fourni
+Exigences : SKL-010
+* Choisir le moteur cible "bevy"
+* Le dossier "skills/bevy" contient "SKILL.md" et "profile.yaml"
+* Le profil de "bevy" prend en charge le parallélisme entre systèmes, les ensembles disjoints, les filtres de changement, la fréquence, les observateurs et les relations
+* Le profil de "bevy" ne prend pas en charge les composants activables, et le skill indique leur équivalent
+* Le skill de "bevy" explique comment intégrer la sonde de débogage fournie pour Bevy

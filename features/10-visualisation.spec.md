@@ -67,3 +67,14 @@ Exigences : VIS-011
 Exigences : VIS-012
 * Le catalogue français contient une traduction pour chaque clé utilisée par l'interface
 * Aucun texte affiché n'est écrit en dur dans le code de l'interface
+
+## Les observateurs sont des lunes autour des planètes qui les déclenchent
+Exigences : VIS-013
+* "Damage" peut ajouter "Dead", et l'observateur "ScoreOnDeath" réagit à l'ajout de "Dead"
+* Une lune "ScoreOnDeath" tourne autour de la planète "Damage"
+
+## Les relations relient les flottes
+Exigences : VIS-014
+* L'archétype "Car" crée des entités "Wheel" reliées par "ChildOf"
+* Un lien "ChildOf" relie la flotte "Wheel" à la flotte "Car"
+* Le panneau de la flotte "Car" affiche, pour chaque voiture, ses roues liées

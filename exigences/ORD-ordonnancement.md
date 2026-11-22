@@ -10,7 +10,7 @@ Un système **écrit** une donnée s'il déclare :
 - `emit` ou `may_emit` sur un canal de messages.
 
 Un système **lit** une donnée s'il déclare :
-- `read` ou `optional` sur un composant ou une ressource ;
+- `read` ou `optional` sur un composant ou une ressource, ou un accès `via` sur un composant ;
 - `read` sur un canal de messages ;
 - `with` ou `without` sur un composant **activable**, car sa sélection dépend alors de l'état
   activé ou désactivé du composant.
@@ -19,6 +19,9 @@ Les accès `with` et `without` sur un composant non activable ne sont ni des lec
 écritures.
 
 Deux systèmes sont **en conflit** si l'un écrit une donnée que l'autre lit ou écrit.
+
+Les observateurs ne sont pas placés dans les étapes : ils s'exécutent aux points de
+synchronisation, seuls, et n'entrent donc en conflit avec aucun système.
 
 Deux systèmes sont **disjoints** si l'un déclare `with` sur un composant que l'autre déclare
 `without` : aucune entité ne peut être sélectionnée par les deux à la fois.
@@ -73,3 +76,10 @@ parallèle, ECS NIDE doit placer chaque système seul dans son étape, dans l'or
 **ORD-015** — ECS NIDE doit traiter chaque couple formé d'un système qui émet sur un canal de
 messages et d'un système qui lit ce canal comme une contrainte d'ordre implicite : l'émetteur
 avant le lecteur.
+
+**ORD-016** — ECS NIDE doit exclure les observateurs des étapes du plan, et indiquer dans
+`schedule.plan.yaml`, pour chaque étape, les observateurs que ses systèmes peuvent déclencher,
+directement ou en cascade.
+
+**ORD-017** — Si les déclenchements possibles entre observateurs forment un cycle, alors ECS NIDE
+doit signaler un avertissement qui nomme les observateurs du cycle dans l'ordre.

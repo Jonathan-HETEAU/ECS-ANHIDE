@@ -115,3 +115,11 @@ Exigences : TST-015
 * Importer un rapport contenant les tests "ecsnide::Mana::example::x" et "ecsnide::Damage::example::basique"
 * L'import signale le test sans correspondance "ecsnide::Mana::example::x"
 * Le résultat de l'exemple "basique" de "Damage" est importé
+
+## Un observateur a son contrat, ses exemples et ses propriétés
+Exigences : TST-016
+* L'observateur "ScoreOnDeath" réagit à l'ajout de "Dead", exige "Enemy" et écrit la ressource "GameState"
+* L'exemple "un-point" donne en entrée l'ajout de "Dead" sur une entité "Enemy" et "GameState.score = 10"
+* Il attend en sortie "GameState.score = 11"
+* L'exemple est cohérent avec le contrat de "ScoreOnDeath"
+* Le contrat de "ScoreOnDeath" contient son déclencheur, sa spécification, ses exemples et ses propriétés

@@ -132,3 +132,41 @@ Exigences : MOD-021
 * Déclarer le système "Pathfinding" avec la fréquence "4"
 * Déclarer le système "Movement" sans fréquence
 * La fréquence de "Pathfinding" est "4" et celle de "Movement" est "1"
+
+## Un événement porte des données et peut viser une entité
+Exigences : MOD-022, MOD-023
+* Déclarer l'événement d'entité "Damaged" avec le champ "amount" de type "f32"
+* Déclarer le système "Collision" qui peut déclencher "Damaged"
+* "Damaged" est un événement d'entité
+* Le contrat de "Collision" indique le déclenchement possible de "Damaged"
+
+## Un observateur réagit à un seul déclencheur
+Exigences : MOD-024, MOD-025
+* Déclarer l'observateur "ScoreOnDeath" qui réagit à l'ajout de "Dead", exige "Enemy" et écrit la ressource "GameState"
+* Déclarer l'observateur "ShowDamage" qui réagit à l'événement "Damaged" et peut émettre sur le canal "Hud"
+* Le dossier "observers/score-on-death" contient "observer.yaml", "spec.md", "examples.yaml" et "properties.yaml"
+* Le déclencheur de "ScoreOnDeath" est l'ajout de "Dead"
+* Le contrat de "ShowDamage" indique l'émission possible sur "Hud"
+
+## Une relation relie des entités sources à une entité cible
+Exigences : MOD-026, MOD-027
+* Déclarer la relation "ChildOf" dont le composant cible est "Children", avec destruction liée
+* "ChildOf" désigne une entité cible
+* "Children" liste les entités sources et n'est jamais écrit directement par un système
+* Détruire une entité cible de "ChildOf" détruit ses entités sources
+
+## Un système lit les composants de la cible d'une relation
+Exigences : MOD-028
+* Déclarer le système "PropagateTransform" qui lit "ChildOf", écrit "GlobalTransform" et lit "GlobalTransform" via "ChildOf"
+* Le contrat de "PropagateTransform" indique la lecture de "GlobalTransform" sur la cible de "ChildOf"
+
+## Un archétype crée ses entités liées
+Exigences : MOD-029
+* Déclarer l'archétype "Wheel" composé de "Position" et "Rotation"
+* Déclarer l'archétype "Car" composé de "Position" et "Velocity", qui crée "4" entités "Wheel" reliées par "ChildOf"
+* L'archétype "Car" déclare "4" entités liées de l'archétype "Wheel" par la relation "ChildOf"
+
+## Un événement d'entité peut se propager le long d'une relation
+Exigences : MOD-030
+* Déclarer l'événement d'entité "Clicked" qui se propage le long de "ChildOf"
+* "Clicked" se propage de l'entité source vers sa cible par "ChildOf"
