@@ -33,8 +33,12 @@ Ce fichier s'adresse à toute personne ou IA qui travaille sur ce dépôt.
 | Application de bureau | Tauri 2 |
 | Cœur, CLI, serveur MCP | Rust (le cœur est une bibliothèque partagée) |
 | Interface | Svelte 5 + TypeScript |
+| Vue orbitale | PixiJS v8 (WebGPU si disponible, sinon WebGL 2) |
+| Traductions de l'interface | Paraglide JS (français en référence) |
 | Règles des propriétés | CEL |
 | Fichiers des projets | YAML + schémas JSON |
+| Protocole de débogage | JSON-RPC 2.0 sur WebSocket, décrit en OpenRPC |
+| Rapports de tests | CTRF (JUnit XML accepté) |
 
 Toute logique métier (modèle, validation, ordonnancement, simulation, génération de données) vit
 dans le **cœur Rust**. L'interface ne fait qu'afficher et transmettre les actions.

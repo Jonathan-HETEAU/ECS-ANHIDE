@@ -108,4 +108,62 @@ Exigences : ORD-009
 Exigences : ORD-011
 * Ouvrir le projet d'exemple "space-shooter"
 * Calculer le plan d'exécution
-* Le fichier "schedule.plan.yaml" contient les étapes, leurs systèmes et les ambiguïtés signalées
+* Le fichier "schedule.plan.yaml" contient les étapes, leurs systèmes, la phase et la fréquence de chaque système, le profil de moteur utilisé et les ambiguïtés signalées
+
+## Activer ou désactiver un composant compte comme une écriture
+Exigences : ORD-002, ORD-003
+* Le composant "Stunned" est activable
+* Le système "StunTimer" écrit "Stunned" et peut désactiver "Stunned"
+* Le système "Act" écrit "Velocity" et exige l'absence de "Stunned"
+* Calculer le plan d'exécution
+* "StunTimer" et "Act" sont dans des étapes différentes
+
+## Un émetteur s'exécute toujours avant les lecteurs de son canal
+Exigences : ORD-015
+* L'ordre de référence est "Sfx", "Collision"
+* "Collision" émet sur le canal "Explosion" et "Sfx" lit "Explosion"
+* Calculer le plan d'exécution
+* "Collision" est dans une étape strictement antérieure à celle de "Sfx"
+* Aucune ambiguïté n'est signalée entre "Collision" et "Sfx"
+
+## Des messages qui se répondent en boucle forment un cycle
+Exigences : ORD-006, ORD-015
+* "A" émet sur le canal "Ping", que lit "B"
+* "B" émet sur le canal "Pong", que lit "A"
+* Calculer le plan d'exécution
+* Aucun plan n'est produit
+* L'erreur nomme le cycle "A → B → A"
+
+## Les phases ne se mélangent jamais
+Exigences : ORD-012
+* Les phases sont "Logique" puis "Rendu"
+* "Movement" écrit "Position" et appartient à "Logique"
+* "Ai" écrit "Velocity" et appartient à "Logique"
+* "Audio" écrit "Sound" et appartient à "Rendu"
+* Calculer le plan d'exécution
+* "Movement" et "Ai" sont dans l'étape "1"
+* "Audio" est dans l'étape "2", bien qu'il ne soit en conflit avec aucun autre système
+
+## Deux systèmes disjoints partagent une étape si le moteur le permet
+Exigences : ORD-013
+* Le profil du moteur cible prend en charge les ensembles disjoints
+* "PlayerMove" écrit "Position" et exige la présence de "Player"
+* "EnemyMove" écrit "Position" et exige l'absence de "Player"
+* Calculer le plan d'exécution
+* "PlayerMove" et "EnemyMove" sont dans la même étape
+
+## Sans prise en charge par le moteur, deux systèmes disjoints restent séparés
+Exigences : ORD-013, ORD-002
+* Le profil du moteur cible ne prend pas en charge les ensembles disjoints
+* "PlayerMove" écrit "Position" et exige la présence de "Player"
+* "EnemyMove" écrit "Position" et exige l'absence de "Player"
+* Calculer le plan d'exécution
+* "PlayerMove" et "EnemyMove" sont dans des étapes différentes
+
+## Un moteur sans parallélisme entre systèmes reçoit une seule orbite
+Exigences : ORD-014
+* Le profil du moteur cible n'exécute pas de systèmes en parallèle
+* Ouvrir le projet d'exemple "space-shooter"
+* Calculer le plan d'exécution
+* Chaque étape contient exactement un système
+* Les systèmes se succèdent dans l'ordre résolu

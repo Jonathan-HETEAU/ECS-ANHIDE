@@ -57,13 +57,16 @@ Quand elle revient au point de départ, une frame s'est écoulée.
 
 | Concept | Définition |
 |---|---|
-| **Composant** | Une donnée typée attachée à une entité. Sans champ, c'est un **marqueur** (un tag). |
+| **Composant** | Une donnée typée attachée à une entité. Sans champ, c'est un **marqueur** (un tag). Un composant **activable** s'active ou se désactive sans changement structurel. |
 | **Ressource** | Une donnée globale unique (le temps, les entrées clavier, la configuration…). |
+| **Canal de messages** | Un flux de données typées, émises par des systèmes et lues par d'autres pendant la même boucle, puis effacées à la fin de la boucle. |
 | **Système** | Une règle qui s'applique à toutes les entités qu'il sélectionne, à chaque boucle. |
 | **Archétype** | Une combinaison de composants, accompagnée d'un volume estimé d'entités. |
+| **Phase** | Une grande section facultative de la boucle (entrées, logique, rendu…), dessinée comme un secteur de l'orbite. |
 | **Étape** | Un groupe de systèmes sans conflit entre eux, exécutés en parallèle. |
 | **Plan d'exécution** | La suite des étapes d'une boucle, calculée par ECS NIDE. |
 | **Contrat** | Tout ce qu'une IA doit savoir pour implémenter un système, réuni en un seul bloc. |
+| **Profil de moteur** | Les capacités du moteur cible (parallélisme entre systèmes, ensembles disjoints, composants activables…), fournies avec ses skills. Le plan d'exécution s'y adapte. |
 
 ## 6. Anatomie d'un système
 
@@ -82,21 +85,37 @@ systems/damage/
 ```yaml
 name: Damage
 description: Applique aux points de vie les dégâts reçus pendant la frame.
+phase: Logique
+per_entity: true         # chaque entité est traitée à partir de ses seules données
+every: 1                 # fréquence : une boucle sur N (1 par défaut)
 components:
   Health: write          # lecture et écriture
   Hit: read              # lecture seule
   Invulnerable: without  # filtre : l'entité ne doit pas l'avoir
+changed: []              # filtre de changement (facultatif)
+messages:
+  DamageTaken: may_emit  # émission possible sur un canal de messages
 structural:
   remove: [Hit]          # certain : retiré à chaque passage
   may_add: [Dead]        # possible : ajouté seulement dans certains cas
+toggles: {}              # activations / désactivations de composants activables
 after: [Collision]       # contrainte d'ordre
 ```
 
-Les accès possibles à un composant sont : `read`, `write`, `optional` (lecture si présent),
-`with` (présence requise, sans accès aux données) et `without` (absence requise).
-Les ressources s'utilisent en `read` ou en `write`.
-Les changements structurels sont l'ajout ou le retrait de composants, la création d'entités
-d'un archétype et la destruction d'entités. Chacun est déclaré **certain** ou **possible**.
+- **Composants** : `read`, `write`, `optional` (lecture si présent), `with` (présence requise,
+  sans accès aux données) et `without` (absence requise). Un composant activable désactivé
+  compte comme absent.
+- **Ressources** : `read` ou `write`.
+- **Canaux de messages** : `emit` (émission certaine), `may_emit` (émission possible) ou `read`.
+- **Filtre de changement** (`changed`) : le système ne traite que les entités dont l'un des
+  composants filtrés a été ajouté ou écrit depuis son précédent passage.
+- **Changements structurels** : ajout ou retrait de composants, création d'entités d'un archétype,
+  destruction d'entités. Chacun est **certain** ou **possible**.
+- **Activations et désactivations** (`toggles`) de composants activables : `enable`, `disable`,
+  `may_enable` ou `may_disable`. Ce ne sont **pas** des changements structurels.
+- **`per_entity`** : vrai si le système traite chaque entité indépendamment des autres. L'IA sait
+  alors qu'elle peut répartir ses entités entre tous les cœurs. Faux par défaut.
+- **`phase`** et **`every`** : la phase du système et sa fréquence.
 
 ### 6.2 La spécification : `spec.md`
 
@@ -131,6 +150,8 @@ Propriétés : sante-positive
   expect:
     Health: { current: 70, max: 100 }
   expect_absent: [Hit]
+  expect_messages:
+    DamageTaken: [{ amount: 30 }]
 
 - id: plancher-zero
   given:
@@ -141,6 +162,9 @@ Propriétés : sante-positive
     Dead: {}
   expect_absent: [Hit]
 ```
+
+Un exemple peut aussi décrire les messages reçus (`given_messages`) et l'état des composants
+activables (`disabled` en entrée, `expect_disabled` et `expect_enabled` en sortie).
 
 ### 6.4 Les tests par propriétés : `properties.yaml`
 
@@ -164,14 +188,15 @@ un langage d'expressions neutre disponible en Rust, Go, C++, Java, C# et JavaScr
 
 ```
 asteroides/
-├── ecs-nide.yaml          # nom, version du format, moteur cible
-├── schedule.yaml          # ordre de référence des systèmes
+├── ecs-nide.yaml          # nom, version du format, moteur cible, langue des fichiers générés
+├── schedule.yaml          # phases et ordre de référence des systèmes
 ├── schedule.plan.yaml     # plan d'exécution calculé (généré)
 ├── components/            # un fichier YAML par composant
 ├── resources/             # un fichier YAML par ressource
+├── messages/              # un fichier YAML par canal de messages
 ├── archetypes/            # un fichier YAML par archétype
 ├── systems/               # un dossier par système (voir § 6)
-├── skills/                # skills du moteur cible (format Agent Skills, SKILL.md)
+├── skills/<moteur>/       # skills du moteur cible (SKILL.md) et son profil (profile.yaml)
 ├── AGENTS.md              # instructions pour les IA (généré)
 └── .vscode/mcp.json       # démarre le serveur MCP depuis VS Code (généré)
 ```
@@ -186,6 +211,24 @@ fields:
   max:     { type: f32, min: 1, max: 1000, default: 100 }
 ```
 
+Un composant activable, stocké de façon dispersée :
+
+```yaml
+name: Stunned
+description: L'entité est étourdie et ne peut pas agir.
+toggleable: true
+storage: sparse          # dense (par défaut) ou sparse
+fields:
+  remaining: { type: f32, min: 0, default: 0 }
+```
+
+L'ordre de référence et les phases :
+
+```yaml
+phases: [Entrees, Logique, Rendu]
+order: [PlayerInput, EnemyAI, Movement, Collision, Damage, Death, Render]
+```
+
 Un archétype :
 
 ```yaml
@@ -196,18 +239,34 @@ estimated_count: 50000
 
 ## 8. L'ordonnancement
 
-- **Une seule boucle.** Tous les systèmes activés s'exécutent une fois par boucle.
-- **Ordre de référence.** `schedule.yaml` donne l'ordre de déclaration. Les contraintes
-  `before` et `after` de chaque système le précisent.
-- **Conflits.** Deux systèmes sont en conflit si l'un écrit un composant ou une ressource
-  que l'autre lit ou écrit. Deux systèmes en conflit ne sont jamais dans la même étape.
-- **Parallélisation calculée.** Chaque système est placé dans la première étape compatible
-  avec ses conflits et ses contraintes d'ordre. Les systèmes d'une même étape se retrouvent
+- **Une seule boucle.** Tous les systèmes activés s'exécutent pendant la boucle, une fois par tour
+  ou une boucle sur N selon leur fréquence.
+- **Ordre de référence.** `schedule.yaml` donne l'ordre de déclaration. Les contraintes `before`
+  et `after` de chaque système le précisent.
+- **Phases.** Si des phases sont déclarées, chaque système appartient à une phase, et une phase ne
+  commence que lorsque la précédente est terminée.
+- **Lire et écrire.** Écrire une donnée, c'est déclarer `write` sur un composant ou une ressource,
+  activer ou désactiver un composant activable, ou émettre sur un canal. Lire, c'est déclarer
+  `read` ou `optional`, ou `with` / `without` sur un composant activable (la sélection dépend alors
+  de son état).
+- **Conflits.** Deux systèmes sont en conflit si l'un écrit une donnée que l'autre lit ou écrit.
+  Deux systèmes en conflit ne sont jamais dans la même étape.
+- **Messages.** Un système qui émet sur un canal passe toujours avant ceux qui le lisent. C'est une
+  contrainte d'ordre implicite, qui évite les ambiguïtés.
+- **Parallélisation calculée.** Chaque système est placé dans la première étape compatible avec
+  ses conflits, ses contraintes d'ordre et sa phase. Les systèmes d'une même étape se retrouvent
   sur des orbites concentriques.
+- **Profil de moteur.** Le plan s'adapte aux capacités du moteur cible :
+  - si le moteur gère les **ensembles disjoints**, deux systèmes dont l'un exige `with: X` et
+    l'autre `without: X` ne sont pas en conflit (seul Bevy le fait aujourd'hui) ;
+  - si le moteur **n'exécute pas de systèmes en parallèle** (cas de Flecs), chaque système a sa
+    propre étape : une seule orbite ;
+  - sans moteur choisi, le **profil générique** s'applique : parallélisme entre systèmes, mais pas
+    d'ensembles disjoints.
 - **Ambiguïtés.** Deux systèmes en conflit sans contrainte d'ordre entre eux sont signalés.
   ECS NIDE les ordonne alors selon l'ordre de déclaration.
 - **Changements structurels différés.** Les ajouts, retraits, créations et destructions sont
-  appliqués à la fin de l'étape.
+  appliqués à la fin de l'étape. Les activations et désactivations, elles, sont immédiates.
 - Le plan est **déterministe** et exporté dans `schedule.plan.yaml` pour les outils externes.
 
 ## 9. Simulation et débogage
@@ -219,16 +278,29 @@ estimated_count: 50000
 - Les flottes parcourent l'orbite étape par étape.
 - Quand l'état d'une entité correspond exactement à l'entrée d'un exemple, on applique la sortie
   de cet exemple.
-- Sinon, on applique les changements structurels **certains**, on signale les changements
-  **possibles** et on marque comme **indéterminés** les champs écrits.
+- Sinon, on applique les changements structurels, activations, désactivations et émissions
+  **certains**, on signale ceux qui sont **possibles** et on marque comme **indéterminés** les
+  champs écrits.
+- Les messages émis pendant une boucle sont lus par les étapes suivantes, puis effacés à la fin de
+  la boucle.
+- Un système de fréquence N ne s'exécute que lors des boucles 0, N, 2N…
+- Un système doté d'un filtre de changement ne voit que les entités modifiées depuis son précédent
+  passage.
 - On dispose du pas à pas (une étape ou une boucle), du retour en arrière, des points d'arrêt,
   de l'activation et de la désactivation de systèmes, et de la modification d'une entité pendant
   la pause.
 
 ### 9.2 Mode réel : se brancher sur le jeu
 
-- Le jeu embarque une **sonde** propre à sa bibliothèque ECS et dialogue avec l'IDE via un
-  **protocole documenté et indépendant du langage**.
+- Le jeu embarque une **sonde** propre à sa bibliothèque ECS et dialogue avec l'IDE via le
+  **protocole de débogage d'ECS NIDE** :
+  - **JSON-RPC 2.0**, la même base que MCP et que le protocole distant de Bevy ;
+  - transporté par **WebSocket** en local, pour pousser une frame à chaque boucle et recevoir les
+    commandes de l'IDE ;
+  - décrit par un document **OpenRPC** publié, qui sert à valider chaque message ;
+  - un encodage binaire (MessagePack) pourra être négocié plus tard si les mesures le justifient.
+- Les sondes s'appuient sur l'existant de chaque moteur, par exemple `bevy_remote` et `Stepping`
+  pour Bevy, ou le module REST pour Flecs.
 - L'IDE compare le plan réel au plan déclaré et signale les divergences.
 - La vue montre les flottes (une par archétype) avec leurs effectifs et le temps passé dans
   chaque système.
@@ -250,9 +322,16 @@ estimated_count: 50000
   continue.
 - **Skills par moteur.** Quand on choisit un moteur cible (Bevy, Flecs, EnTT, Unity DOTS…), l'IDE
   installe ses skills dans `skills/`. Ils expliquent comment traduire chaque concept du modèle
-  vers ce moteur, comment transformer exemples et propriétés en tests (par exemple avec
-  `proptest` pour Bevy), comment produire le rapport de résultats au format neutre et comment
-  intégrer la sonde de débogage.
+  vers ce moteur (et quel équivalent utiliser quand le moteur ne le connaît pas), comment
+  transformer exemples et propriétés en tests (par exemple avec `proptest` pour Bevy), comment
+  produire le rapport de résultats et comment intégrer la sonde de débogage. Ils fournissent aussi
+  le **profil du moteur** (`profile.yaml`).
+- **Rapports de tests.** Le format neutre est **CTRF** (JSON avec un schéma normatif), avec des
+  champs d'extension d'ECS NIDE : système, type de test, identifiant, contre-exemple, graine.
+  **JUnit XML** est accepté aussi, grâce à la convention de nommage
+  `ecsnide::<Système>::example::<id>` ou `ecsnide::<Système>::property::<id>`.
+- **Langue des fichiers générés.** `AGENTS.md` et les skills sont rédigés dans la langue du projet,
+  l'anglais par défaut.
 - **Boucle de travail type** : l'humain décrit un système → l'IA récupère son contrat via MCP →
   l'IA implémente le système et ses tests dans le moteur, en suivant le skill → les résultats
   remontent dans l'IDE → un échec, ou un bug observé, devient un nouveau test.
@@ -265,8 +344,12 @@ estimated_count: 50000
 | Cœur : modèle, validation, ordonnancement, simulation, générateurs, protocole | **Rust** (bibliothèque partagée) |
 | Serveur MCP et CLI | **Rust**, un seul binaire `ecs-nide`, réutilisant le cœur |
 | Interface | **Svelte 5 + TypeScript** |
+| Vue orbitale | **PixiJS v8** : WebGPU quand il est disponible, sinon WebGL 2 |
+| Traductions de l'interface | **Paraglide JS**, le français étant la langue de référence |
 | Règles des propriétés | **CEL** |
 | Format des fichiers | **YAML**, accompagné de schémas JSON |
+| Protocole de débogage | **JSON-RPC 2.0 sur WebSocket**, décrit en **OpenRPC** |
+| Rapports de tests | **CTRF**, et JUnit XML accepté |
 
 L'IDE, la CLI et le serveur MCP passent tous par le **même cœur Rust**. Une opération donne donc
 le même résultat partout.
@@ -295,25 +378,34 @@ les `spec.md` des systèmes dans l'IDE.
 | 2 | CLI `ecs-nide` : `validate`, `plan`, `contract` |
 | 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés |
 | 4 | Serveur MCP + génération de `AGENTS.md` et `.vscode/mcp.json` |
-| 5 | IDE Tauri/Svelte : vue orbitale, éditeurs, diagnostics |
+| 5 | IDE Tauri/Svelte : vue orbitale (prototype de rendu PixiJS mesuré d'abord sur Windows, macOS et Linux), éditeurs, diagnostics |
 | 6 | Simulation en mode modèle dans l'IDE |
 | 7 | Skills du premier moteur (Bevy proposé) |
 | 8 | Protocole de débogage réel + sonde du premier moteur |
 
-## 14. Questions ouvertes
+## 14. Décisions et questions ouvertes
 
-> Une étude des principaux moteurs ECS propose une réponse à chacune de ces questions :
-> [`recherche/etat-de-l-art-ecs.md`](recherche/etat-de-l-art-ecs.md).
+### Décisions du 22 novembre 2026
 
-- **Événements et messages** entre systèmes : concept à part entière, ou modélisés par des
-  composants et des ressources ?
-- **Parallélisation par ensembles disjoints** : deux systèmes qui écrivent `Position`, l'un avec
-  `with: Enemy` et l'autre avec `without: Enemy`, ne touchent jamais les mêmes entités. Faut-il
-  autoriser leur mise en parallèle ? C'est un gain réel à grande échelle, mais certaines
-  bibliothèques ECS ne savent pas le faire.
-- **Protocole de débogage réel** : quel transport (TCP, WebSocket, mémoire partagée) et quel
-  encodage (MessagePack, FlatBuffers…) ?
-- **Format neutre des rapports de tests** : JUnit XML, ou un JSON propre à ECS NIDE ?
-- **Rendu de la vue orbitale** : Canvas 2D, WebGL ou WebGPU ?
-- **Premier moteur cible** : Bevy ?
-- **Langue de l'interface** : français uniquement, ou internationalisation dès le départ ?
+Elles s'appuient sur l'étude des principaux moteurs ECS :
+[`recherche/etat-de-l-art-ecs.md`](recherche/etat-de-l-art-ecs.md).
+
+| Sujet | Décision |
+|---|---|
+| Événements | **Canaux de messages** (`emit` / `may_emit` / `read`), effacés à chaque boucle, l'émetteur passant toujours avant les lecteurs. Les observateurs sont reportés. |
+| Ensembles disjoints | Calculés dans le cœur, utilisés seulement si le **profil du moteur** le permet |
+| Parallélisme de données | Attribut **`per_entity`** sur chaque système |
+| Protocole de débogage | **JSON-RPC 2.0 sur WebSocket**, décrit en **OpenRPC** ; MessagePack plus tard si les mesures le justifient |
+| Rapports de tests | **CTRF**, et JUnit XML avec une convention de nommage |
+| Rendu | **PixiJS v8** (WebGPU si disponible, sinon WebGL 2), validé par un prototype mesuré |
+| Langue | Interface **internationalisée** (Paraglide JS), français en référence ; fichiers générés dans la langue du projet, l'anglais par défaut |
+| Nouveaux concepts | Composants **activables**, filtre **`changed`**, **phases**, **fréquence** (`every`), indication de **stockage** |
+
+### Questions encore ouvertes
+
+- **Observateurs** : s'ils deviennent nécessaires, les modéliser comme des réactions à un
+  changement structurel, exécutées au point de synchronisation de fin d'étape ?
+- **Relations entre entités** (hiérarchies, liens) : le type de champ `entity` suffit pour
+  l'instant. Faut-il un concept dédié, comme chez Flecs et Bevy ?
+- **Premier moteur cible** : Bevy est proposé.
+- **Points à vérifier** dans les documentations officielles : ceux marqués ⚠ dans l'étude.

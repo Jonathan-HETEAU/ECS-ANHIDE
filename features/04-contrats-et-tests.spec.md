@@ -9,9 +9,11 @@ Exigences : TST-001, TST-013
 * Ouvrir le projet d'exemple "space-shooter"
 * Obtenir le contrat du système "Damage"
 * Le contrat contient la spécification, les accès, les changements structurels et les contraintes d'ordre
+* Le contrat contient la phase, la fréquence et l'attribut "per_entity" de "Damage"
+* Le contrat contient l'indication de stockage de chaque composant utilisé
 * Le contrat contient les schémas de "Health", "Hit", "Invulnerable" et "Dead"
 * Le contrat contient les exemples et les propriétés de "Damage"
-* Le contrat référence le skill du moteur cible du projet
+* Le contrat contient le profil du moteur cible et référence son skill
 * Le contrat ne contient aucun schéma de composant que "Damage" n'utilise pas
 
 ## Un scénario de spécification renvoie à des exemples existants
@@ -73,7 +75,7 @@ Exigences : TST-010
 
 ## Les résultats des tests exécutés à l'extérieur remontent dans l'IDE
 Exigences : TST-011
-* Importer un rapport de tests où l'exemple "basique" de "Damage" réussit et la propriété "sante-positive" échoue avec le contre-exemple "Health.current = 0, Hit.amount = 1"
+* Importer un rapport CTRF où l'exemple "basique" de "Damage" réussit et la propriété "sante-positive" échoue avec le contre-exemple "Health.current = 0, Hit.amount = 1"
 * L'IDE affiche "Damage" avec "1" test réussi et "1" test échoué
 * Le contre-exemple est affiché avec la propriété "sante-positive"
 
@@ -88,3 +90,28 @@ Exigences : TST-012
 Exigences : TST-012
 * Pendant une session de débogage, capturer l'entité "42" avant et après le passage de "Damage"
 * "Damage" possède un nouvel exemple dont l'entrée et la sortie sont l'état capturé
+
+## Un exemple peut décrire l'état des composants activables et les messages
+Exigences : TST-002
+* Le système "StunTimer" écrit "Stunned", peut désactiver "Stunned" et peut émettre sur le canal "StunEnded"
+* L'exemple "fin" de "StunTimer" donne en entrée "Stunned" activé avec "Stunned.remaining = 0"
+* Il attend en sortie "Stunned" désactivé et un message "StunEnded"
+* L'exemple est cohérent avec le contrat de "StunTimer"
+
+## Un exemple qui émet un message non déclaré est incohérent
+Exigences : TST-005
+* Le système "Sfx" lit le canal "Explosion" et n'émet sur aucun canal
+* Un exemple de "Sfx" attend en sortie un message "Explosion"
+* La validation signale que "Sfx" n'émet pas sur "Explosion"
+
+## Un rapport JUnit XML est rattaché grâce à la convention de nommage
+Exigences : TST-014
+* Importer un rapport JUnit XML où le test "ecsnide::Damage::example::basique" réussit et le test "ecsnide::Damage::property::sante-positive" échoue
+* L'IDE affiche l'exemple "basique" de "Damage" comme réussi
+* L'IDE affiche la propriété "sante-positive" de "Damage" comme échouée
+
+## Un résultat sans correspondance est signalé sans bloquer l'import
+Exigences : TST-015
+* Importer un rapport contenant les tests "ecsnide::Mana::example::x" et "ecsnide::Damage::example::basique"
+* L'import signale le test sans correspondance "ecsnide::Mana::example::x"
+* Le résultat de l'exemple "basique" de "Damage" est importé

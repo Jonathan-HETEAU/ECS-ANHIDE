@@ -12,6 +12,7 @@ Exigences : DBG-001, DBG-011
 * Démarrer la sonde de référence avec le projet d'exemple "space-shooter"
 * Se connecter depuis l'IDE
 * L'IDE indique la connexion et affiche la frame en cours
+* Chaque message échangé est du JSON-RPC 2.0 transporté par WebSocket et conforme au document OpenRPC du protocole
 
 ## Une différence entre le plan réel et le plan déclaré est signalée
 Exigences : DBG-002
@@ -67,3 +68,10 @@ Exigences : DBG-010
 * Mesurer le volume échangé par frame avec "1000" entités
 * Mesurer le volume échangé par frame avec "10000000" entités
 * Hors échantillons demandés, les deux volumes sont identiques à une constante près
+
+## Un message non conforme d'une sonde est signalé sans couper la session
+Exigences : DBG-012
+* Se connecter à la sonde de référence
+* La sonde envoie un message non conforme au document OpenRPC
+* L'IDE signale le message non conforme
+* La session continue et les frames suivantes sont affichées

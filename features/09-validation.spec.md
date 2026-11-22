@@ -49,3 +49,38 @@ Exigences : VAL-007
 * Ouvrir le projet d'exemple "space-shooter" dans l'IDE
 * Ajouter au système "Movement" la lecture du composant inexistant "Mana"
 * En moins d'une seconde, le diagnostic "composant inconnu : Mana" apparaît
+
+## Avec des phases déclarées, chaque système doit avoir sa phase
+Exigences : VAL-008
+* Les phases sont "Logique" puis "Rendu"
+* Le système "Audio" n'est rattaché à aucune phase
+* La validation signale l'erreur « "Audio" n'est rattaché à aucune phase »
+
+## On ne peut activer ou désactiver qu'un composant activable
+Exigences : VAL-009
+* Le composant "Health" n'est pas activable
+* Le système "Heal" déclare l'activation de "Health"
+* La validation signale que "Health" n'est pas activable
+
+## Un filtre de changement porte sur un composant sélectionné
+Exigences : VAL-010
+* Le système "RebuildBounds" lit "Collider" et filtre les changements de "Velocity"
+* La validation signale que "RebuildBounds" filtre "Velocity" sans le sélectionner
+
+## Un système ne lit pas le canal sur lequel il émet
+Exigences : VAL-011
+* Le système "Echo" émet sur le canal "Ping" et lit le canal "Ping"
+* La validation signale que "Echo" émet et lit le même canal "Ping"
+
+## Un canal sans émetteur ou sans lecteur est signalé
+Exigences : VAL-012
+* Le système "Sfx" lit le canal "Explosion" et aucun système n'émet sur "Explosion"
+* Le système "Score" émet sur le canal "Points" et aucun système ne lit "Points"
+* La validation signale que "Explosion" est lu mais jamais émis
+* La validation signale que "Points" est émis mais jamais lu
+
+## Un concept non pris en charge par le moteur est signalé
+Exigences : VAL-013
+* Le profil du moteur cible ne prend pas en charge les composants activables
+* Le projet déclare le composant activable "Stunned"
+* La validation signale que les composants activables ne sont pas pris en charge par le moteur cible et renvoie à son skill

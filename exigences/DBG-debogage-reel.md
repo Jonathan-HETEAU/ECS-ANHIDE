@@ -1,7 +1,8 @@
 # DBG — Le débogage du jeu réel
 
 **DBG-001** — ECS NIDE doit pouvoir se connecter à un jeu en cours d'exécution équipé d'une sonde,
-via un protocole documenté et indépendant du langage.
+via le protocole de débogage d'ECS NIDE : JSON-RPC 2.0 transporté par WebSocket, décrit par un
+document OpenRPC publié avec ECS NIDE.
 
 **DBG-002** — Quand la connexion à un jeu est établie, l'IDE doit comparer le plan d'exécution
 réel au plan du projet et signaler chaque divergence : système absent, système inconnu, ordre ou
@@ -34,3 +35,6 @@ données indépendant du nombre d'entités du jeu, hors échantillons demandés.
 
 **DBG-011** — ECS NIDE doit fournir une sonde de référence qui simule un jeu conforme au protocole,
 afin de tester l'IDE sans moteur réel.
+
+**DBG-012** — Si une sonde envoie un message non conforme au document OpenRPC du protocole, alors
+l'IDE doit signaler le message non conforme, l'ignorer et poursuivre la session.

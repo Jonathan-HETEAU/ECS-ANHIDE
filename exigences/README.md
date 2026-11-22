@@ -47,4 +47,4 @@ de [`features/`](../features/) et les tests.
 | [MCP-mcp-et-cli.md](MCP-mcp-et-cli.md) | MCP |
 | [SKL-skills-moteurs.md](SKL-skills-moteurs.md) | SKL |
 | [VAL-validation.md](VAL-validation.md) | VAL |
-| [VIS-visualisation.md](VIS-visualisation.md) | VIS |
+| [VIS-visualisation.md](VIS-visualisation.md) (visualisation et interface) | VIS |

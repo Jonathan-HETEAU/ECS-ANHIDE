@@ -87,3 +87,37 @@ Exigences : SIM-012
 * Le système "Weapon" crée toujours une entité de l'archétype "Bullet"
 * Une entité est traitée par "Weapon"
 * À la fin de l'étape, une nouvelle entité possède les composants de "Bullet" avec leurs valeurs par défaut
+
+## Un système de fréquence N ne s'exécute qu'une boucle sur N
+Exigences : SIM-013
+* Le système "Pathfinding" a la fréquence "4"
+* Exécuter "8" boucles
+* "Pathfinding" a été exécuté lors des boucles "0" et "4" uniquement
+
+## Un message émis est lu dans la même boucle puis effacé
+Exigences : SIM-014
+* "Collision" émet toujours sur le canal "Explosion" et "Sfx" lit "Explosion"
+* Une entité est sélectionnée par "Collision"
+* Exécuter les étapes jusqu'à celle de "Sfx" incluse
+* "Sfx" a reçu le message "Explosion" émis pendant cette boucle
+* Les champs de ce message sont indéterminés, faute d'exemple correspondant
+* Au début de la boucle suivante, le canal "Explosion" est vide
+
+## Désactiver un composant prend effet immédiatement, sans changer d'archétype
+Exigences : SIM-015
+* "StunTimer" écrit "Stunned" et le désactive toujours
+* "Act" écrit "Velocity", exige l'absence de "Stunned" et s'exécute après "StunTimer"
+* Une entité possède "Velocity" et "Stunned" activé
+* Exécuter l'étape de "StunTimer"
+* L'entité possède toujours "Stunned", désactivé, et son archétype n'a pas changé
+* Dans la même boucle, "Act" sélectionne l'entité
+
+## Un filtre de changement ne présente que les entités modifiées
+Exigences : SIM-016
+* "RebuildBounds" lit "Collider", écrit "Bounds" et filtre les changements de "Collider"
+* Les entités "A" et "B" possèdent "Collider" et "Bounds"
+* Exécuter une boucle
+* "RebuildBounds" a traité "A" et "B", puisque c'est son premier passage
+* Pendant la pause, modifier "Collider.radius" de "A"
+* Exécuter une boucle
+* "RebuildBounds" a traité "A" et n'a pas traité "B"

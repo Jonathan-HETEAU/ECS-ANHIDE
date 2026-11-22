@@ -1,8 +1,10 @@
 # État de l'art des moteurs ECS — réponses aux questions ouvertes
 
-> Étude réalisée en novembre 2026 pour trancher les questions ouvertes de [`VISION.md`](../VISION.md#14-questions-ouvertes).
-> Aucune décision n'est prise ici : chaque section se termine par une **recommandation** que
-> l'équipe valide ou non.
+> Étude réalisée en novembre 2026 pour trancher les questions ouvertes de [`VISION.md`](../VISION.md#14-décisions-et-questions-ouvertes).
+> Chaque section se termine par une **recommandation**.
+>
+> **Statut : toutes les recommandations ont été retenues le 22 novembre 2026.** Elles sont
+> intégrées dans `VISION.md`, `exigences/` et `features/`.
 
 ## Méthode et limites
 

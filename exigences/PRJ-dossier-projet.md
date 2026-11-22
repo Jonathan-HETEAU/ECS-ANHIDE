@@ -1,8 +1,8 @@
 # PRJ — Le dossier projet
 
 **PRJ-001** — Quand l'utilisateur crée un projet, ECS NIDE doit créer un dossier contenant
-`ecs-nide.yaml`, `schedule.yaml` et les répertoires `components/`, `resources/`, `archetypes/`,
-`systems/` et `skills/`.
+`ecs-nide.yaml`, `schedule.yaml` et les répertoires `components/`, `resources/`, `messages/`,
+`archetypes/`, `systems/` et `skills/`.
 
 **PRJ-002** — Quand l'utilisateur crée un projet, ECS NIDE doit générer un fichier `AGENTS.md` qui
 explique aux IA la structure du dossier, le format des fichiers et la méthode de travail fondée
@@ -28,3 +28,7 @@ version extérieure.
 
 **PRJ-009** — Si `ecs-nide.yaml` déclare une version de format supérieure à celle que gère
 ECS NIDE, alors ECS NIDE doit ouvrir le projet en lecture seule et en expliquer la raison.
+
+**PRJ-010** — ECS NIDE doit rédiger les fichiers qu'il génère dans un projet (`AGENTS.md`, et les
+skills lorsqu'ils existent dans cette langue) dans la langue choisie pour le projet et enregistrée
+dans `ecs-nide.yaml`, l'anglais étant la langue par défaut.

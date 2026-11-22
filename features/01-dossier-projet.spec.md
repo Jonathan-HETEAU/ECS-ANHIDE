@@ -7,7 +7,7 @@ l'IDE, le serveur MCP, la CLI et les outils externes lisent et écrivent les mê
 Exigences : PRJ-001, PRJ-002, MCP-008
 * Créer le projet "Asteroides" dans un dossier vide
 * Le dossier contient les fichiers "ecs-nide.yaml", "schedule.yaml", "AGENTS.md" et ".vscode/mcp.json"
-* Le dossier contient les répertoires "components", "resources", "archetypes", "systems" et "skills"
+* Le dossier contient les répertoires "components", "resources", "messages", "archetypes", "systems" et "skills"
 * La validation du projet ne signale aucune erreur
 
 ## Un projet rouvert est identique au projet enregistré
@@ -53,3 +53,10 @@ Exigences : PRJ-007
 Exigences : PRJ-009
 * Ouvrir un projet dont "ecs-nide.yaml" déclare une version de format supérieure à celle de l'IDE
 * L'IDE ouvre le projet en lecture seule et explique pourquoi
+
+## Les fichiers générés sont rédigés dans la langue du projet
+Exigences : PRJ-010
+* Créer le projet "Asteroides" sans préciser de langue
+* "ecs-nide.yaml" indique la langue "en" et "AGENTS.md" est rédigé en anglais
+* Créer le projet "Asteroides-fr" avec la langue "fr"
+* "ecs-nide.yaml" indique la langue "fr" et "AGENTS.md" est rédigé en français

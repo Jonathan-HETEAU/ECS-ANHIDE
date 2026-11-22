@@ -74,3 +74,61 @@ Exigences : MOD-012
 * Ouvrir le projet d'exemple "space-shooter"
 * Demander la suppression du composant "Velocity"
 * L'IDE liste les systèmes et archétypes qui référencent "Velocity" et demande confirmation
+
+## Un composant activable désactivé compte comme absent
+Exigences : MOD-013, MOD-009
+* Déclarer le composant activable "Stunned"
+* Déclarer le système "Act" qui écrit "Velocity" et exige l'absence de "Stunned"
+* La sélection de "Act" donne :
+
+  | composants de l'entité          | sélectionnée |
+  |---------------------------------|--------------|
+  | Velocity                        | oui          |
+  | Velocity, Stunned (activé)      | non          |
+  | Velocity, Stunned (désactivé)   | oui          |
+
+## Activer ou désactiver un composant n'est pas un changement structurel
+Exigences : MOD-014
+* Déclarer le composant activable "Stunned"
+* Déclarer le système "StunTimer" qui écrit "Stunned" et peut désactiver "Stunned"
+* Le contrat de "StunTimer" indique la désactivation possible de "Stunned"
+* Le contrat de "StunTimer" ne déclare aucun changement structurel
+
+## Un filtre de changement restreint le système aux entités modifiées
+Exigences : MOD-015
+* Déclarer le système "RebuildBounds" qui lit "Collider", écrit "Bounds" et filtre les changements de "Collider"
+* Le contrat de "RebuildBounds" indique le filtre de changement sur "Collider"
+
+## Un composant porte une indication de stockage
+Exigences : MOD-016
+* Déclarer le composant "Hit" avec le stockage "sparse"
+* Déclarer le composant "Position" sans indication de stockage
+* Le stockage de "Hit" est "sparse" et celui de "Position" est "dense"
+* Le contrat de "Damage" indique le stockage "sparse" pour "Hit"
+
+## Un canal de messages transporte des données typées
+Exigences : MOD-017, MOD-018
+* Déclarer le canal de messages "Explosion" avec les champs "position" de type "vec2" et "radius" de type "f32"
+* Déclarer le système "Collision" qui peut émettre sur "Explosion"
+* Déclarer le système "Sfx" qui lit "Explosion"
+* Le contrat de "Collision" indique l'émission possible sur "Explosion"
+* Le contrat de "Sfx" indique la lecture de "Explosion" et contient le schéma de "Explosion"
+
+## Un système déclare s'il traite chaque entité indépendamment
+Exigences : MOD-019
+* Déclarer le système "Movement" avec "per_entity" à vrai
+* Déclarer le système "Broadphase" sans préciser "per_entity"
+* Le contrat de "Movement" indique un traitement par entité
+* Le contrat de "Broadphase" indique un traitement qui n'est pas par entité
+
+## Les systèmes se rattachent à des phases
+Exigences : MOD-020
+* Déclarer les phases "Entrees", "Logique" et "Rendu", dans cet ordre
+* Rattacher "PlayerInput" à "Entrees" et "Render" à "Rendu"
+* La phase de "PlayerInput" est "Entrees" et celle de "Render" est "Rendu"
+
+## Un système peut ne s'exécuter qu'une boucle sur N
+Exigences : MOD-021
+* Déclarer le système "Pathfinding" avec la fréquence "4"
+* Déclarer le système "Movement" sans fréquence
+* La fréquence de "Pathfinding" est "4" et celle de "Movement" est "1"

@@ -90,4 +90,4 @@ revient à changer les scénarios.
 | [07-mcp-et-cli.spec.md](07-mcp-et-cli.spec.md) | Serveur MCP et ligne de commande | MCP |
 | [08-skills-moteurs.spec.md](08-skills-moteurs.spec.md) | Skills propres à chaque moteur | SKL |
 | [09-validation.spec.md](09-validation.spec.md) | Diagnostics du modèle | VAL |
-| [10-visualisation.spec.md](10-visualisation.spec.md) | Trou noir, orbites, planètes, flottes | VIS |
+| [10-visualisation.spec.md](10-visualisation.spec.md) | Trou noir, orbites, planètes, flottes, interface | VIS |
