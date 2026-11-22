@@ -1,0 +1,8 @@
+name: Collision
+description: Détecte les contacts et inflige des dégâts.
+components:
+  Position: read
+  Collider: read
+structural:
+  may_add:
+  - Hit

@@ -1,0 +1,5 @@
+name: Rotation
+description: Orientation, en radians.
+fields:
+  angle:
+    type: f32

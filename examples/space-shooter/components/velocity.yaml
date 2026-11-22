@@ -1,0 +1,5 @@
+name: Velocity
+description: Vitesse, en unités par seconde.
+fields:
+  value:
+    type: vec2

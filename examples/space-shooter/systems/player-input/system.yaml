@@ -1,0 +1,8 @@
+name: PlayerInput
+description: Applique les commandes du joueur à la vitesse de son vaisseau.
+per_entity: true
+components:
+  Velocity: write
+  Player: with
+resources:
+  InputState: read

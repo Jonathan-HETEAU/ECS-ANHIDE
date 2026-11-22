@@ -1,0 +1,6 @@
+name: Particle
+components:
+- Position
+- Velocity
+- Lifetime
+estimated_count: 2000000

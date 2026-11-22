@@ -24,8 +24,15 @@ Dans les `spec.md` des systèmes, la ligne de traçabilité devient `Exemples : 
 ## Exécution
 
 Chaque phrase d'étape est reliée à une fonction de test : en Rust pour le cœur, la CLI et le
-serveur MCP, en TypeScript pour l'interface. Une étape sans fonction associée fait **échouer**
-le scénario. Une spécification n'est donc jamais « décorative ».
+serveur MCP (`crates/ecs-nide-specs/src/steps/`), en TypeScript pour l'interface. Une étape sans
+fonction associée fait **échouer** le scénario. Une spécification n'est donc jamais
+« décorative ».
+
+Pour retrouver la fonction d'une étape, la phrase est normalisée : chaque valeur entre guillemets
+devient `{}`, et une liste de valeurs séparées par des virgules devient `{…}`.
+
+Les scénarios qui doivent passer sont listés dans [`actifs.yaml`](actifs.yaml) (voir
+[`AGENTS.md`](../AGENTS.md#scénarios-actifs)).
 
 ## Exemple
 

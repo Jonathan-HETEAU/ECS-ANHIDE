@@ -1,0 +1,8 @@
+- id: sante-positive
+  description: Les points de vie ne deviennent jamais négatifs.
+  domain:
+    Hit.amount: { min: 0, max: 100000 }
+  ensure: after.Health.current >= 0.0
+
+- id: sante-ne-remonte-pas
+  ensure: after.Health.current <= before.Health.current

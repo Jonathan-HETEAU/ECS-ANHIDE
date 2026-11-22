@@ -1,0 +1,7 @@
+name: Collider
+description: Disque de collision.
+fields:
+  radius:
+    type: f32
+    min: 0
+    default: 1

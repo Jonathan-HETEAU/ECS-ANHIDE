@@ -1,0 +1,8 @@
+name: Movement
+description: Fait avancer les entités selon leur vitesse.
+per_entity: true
+components:
+  Velocity: read
+  Position: write
+resources:
+  Time: read

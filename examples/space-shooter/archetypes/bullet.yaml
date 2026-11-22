@@ -1,0 +1,8 @@
+name: Bullet
+components:
+- Position
+- Velocity
+- Sprite
+- Collider
+- Lifetime
+estimated_count: 10000

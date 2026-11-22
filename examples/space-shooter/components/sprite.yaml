@@ -1,0 +1,5 @@
+name: Sprite
+description: Image affichée à la position de l'entité.
+fields:
+  image:
+    type: string

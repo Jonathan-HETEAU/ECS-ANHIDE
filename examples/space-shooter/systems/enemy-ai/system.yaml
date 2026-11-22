@@ -1,0 +1,8 @@
+name: EnemyAI
+description: Oriente la vitesse des ennemis vers leur cible.
+components:
+  Position: read
+  Velocity: write
+  Target: optional
+  Enemy: with
+  Dead: without

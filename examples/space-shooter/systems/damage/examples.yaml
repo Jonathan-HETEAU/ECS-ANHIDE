@@ -1,0 +1,16 @@
+- id: basique
+  given:
+    Health: { current: 100, max: 100 }
+    Hit: { amount: 30 }
+  expect:
+    Health: { current: 70, max: 100 }
+  expect_absent: [Hit]
+
+- id: plancher-zero
+  given:
+    Health: { current: 10, max: 100 }
+    Hit: { amount: 50 }
+  expect:
+    Health: { current: 0, max: 100 }
+    Dead: {}
+  expect_absent: [Hit]

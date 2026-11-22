@@ -1,0 +1,10 @@
+name: Weapon
+description: Crée des projectiles quand le joueur tire.
+components:
+  Position: read
+  Player: with
+resources:
+  InputState: read
+structural:
+  may_spawn:
+  - Bullet

@@ -1,0 +1,8 @@
+name: Hit
+description: Dégâts reçus pendant la frame, en attente d'application.
+storage: sparse
+fields:
+  amount:
+    type: f32
+    min: 0
+    max: 100000

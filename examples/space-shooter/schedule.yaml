@@ -1,0 +1,10 @@
+order:
+- PlayerInput
+- EnemyAI
+- Weapon
+- Movement
+- Lifetime
+- Collision
+- Damage
+- Death
+- Render

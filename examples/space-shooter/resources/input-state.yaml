@@ -1,0 +1,7 @@
+name: InputState
+description: État des commandes du joueur.
+fields:
+  thrust:
+    type: vec2
+  fire:
+    type: bool

@@ -1,0 +1,16 @@
+[package]
+name = "ecs-nide-core"
+description = "Cœur d'ECS NIDE : modèle, chargement du dossier projet, ordonnancement."
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+indexmap.workspace = true
+serde.workspace = true
+serde_yaml.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

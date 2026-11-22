@@ -48,7 +48,37 @@ dans le **cœur Rust**. L'interface ne fait qu'afficher et transmettre les actio
 - La documentation, les exigences, les scénarios et l'interface sont en **français**.
 - Le code, les identifiants et les clés des fichiers YAML sont en **anglais**.
 
+## Scénarios actifs
+
+- `cargo test` exécute **tous** les scénarios de `features/` (test `scenarios_actifs`).
+- Les scénarios listés dans [`features/actifs.yaml`](features/actifs.yaml) sont **actifs** : ils
+  doivent passer. Une étape sans fonction ou un échec fait échouer `cargo test`.
+- Les autres sont seulement rapportés (passent, échouent, non implémentés). Quand un scénario
+  inactif passe, le rapport demande de l'activer : on l'ajoute alors à `actifs.yaml`.
+- **Un scénario actif ne redevient jamais inactif.** Le retirer de `actifs.yaml` revient à
+  désactiver un test.
+- Le test `traceabilite` vérifie que chaque exigence est citée par au moins un scénario et que
+  chaque scénario ne cite que des exigences existantes.
+
+## Commandes
+
+```sh
+cargo test --workspace                                       # tous les tests, scénarios compris
+cargo test -p ecs-nide-specs --test scenarios -- --nocapture # rapport d'avancement des scénarios
+cargo clippy --workspace --all-targets -- -D warnings        # aucun avertissement toléré
+cargo fmt --all
+```
+
+## Organisation du code
+
+| Crate | Rôle |
+|---|---|
+| `crates/spec-markdown` | Parseur et exécuteur du format Spec Markdown |
+| `crates/ecs-nide-core` | Le cœur : modèle, chargement du dossier projet, ordonnancement |
+| `crates/ecs-nide-specs` | Les fonctions des étapes de `features/` et les tests de traçabilité |
+| `examples/space-shooter` | Le projet d'exemple décrit dans `features/README.md` |
+
 ## État actuel
 
-Phase 0 : les spécifications sont en cours de validation. Aucun code n'est écrit tant qu'elles ne
-sont pas validées.
+Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **en cours**. L'ordonnancement est
+fait ; la suite porte sur l'enregistrement du projet, la modélisation et la validation.

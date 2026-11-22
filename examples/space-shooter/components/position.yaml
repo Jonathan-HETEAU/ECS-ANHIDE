@@ -1,0 +1,5 @@
+name: Position
+description: Position dans le monde.
+fields:
+  value:
+    type: vec2

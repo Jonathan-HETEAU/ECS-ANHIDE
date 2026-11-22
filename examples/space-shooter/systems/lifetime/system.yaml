@@ -1,0 +1,9 @@
+name: Lifetime
+description: Décompte le temps restant et détruit les entités expirées.
+per_entity: true
+components:
+  Lifetime: write
+resources:
+  Time: read
+structural:
+  may_despawn: true

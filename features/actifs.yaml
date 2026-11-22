@@ -1,0 +1,30 @@
+# Scénarios actifs : ils doivent passer à chaque exécution de `cargo test`.
+#
+# Règles :
+# - un scénario devient actif dès que ses étapes sont implémentées et qu'il passe ;
+# - un scénario actif ne redevient jamais inactif (voir AGENTS.md) ;
+# - la valeur `tous` active tous les scénarios d'un fichier.
+
+03-ordonnancement.spec.md:
+- Chaque système activé apparaît exactement une fois dans le plan
+- Deux systèmes qui écrivent le même composant ne sont jamais dans la même étape
+- Un système qui lit ce qu'un autre écrit n'est pas dans la même étape
+- Les ressources suivent les mêmes règles de conflit
+- Un filtre de présence ou d'absence ne crée pas de conflit
+- Chaque système rejoint la première étape compatible
+- Une contrainte d'ordre est toujours respectée
+- Une contrainte d'ordre circulaire est une erreur
+- Deux systèmes en conflit sans contrainte d'ordre forment une ambiguïté
+- Le plan est déterministe
+- Un système désactivé ne figure pas dans le plan
+- Le plan calculé est exporté pour les outils externes
+- Activer ou désactiver un composant compte comme une écriture
+- Un émetteur s'exécute toujours avant les lecteurs de son canal
+- Des messages qui se répondent en boucle forment un cycle
+- Les phases ne se mélangent jamais
+- Deux systèmes disjoints partagent une étape si le moteur le permet
+- Sans prise en charge par le moteur, deux systèmes disjoints restent séparés
+- Un moteur sans parallélisme entre systèmes reçoit une seule orbite
+- Les observateurs n'occupent aucune étape
+- Une cascade circulaire d'observateurs est signalée
+- Une lecture via une relation compte comme une lecture

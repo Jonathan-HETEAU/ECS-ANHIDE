@@ -1,0 +1,5 @@
+name: GameState
+description: État global de la partie.
+fields:
+  score:
+    type: u32

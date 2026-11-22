@@ -1,0 +1,13 @@
+[package]
+name = "ecs-nide-specs"
+description = "Exécution des scénarios de features/ et vérification de la traçabilité des exigences."
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ecs-nide-core = { path = "../ecs-nide-core" }
+spec-markdown = { path = "../spec-markdown" }
+serde_yaml.workspace = true
+tempfile.workspace = true

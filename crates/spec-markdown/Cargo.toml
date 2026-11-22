@@ -1,0 +1,10 @@
+[package]
+name = "spec-markdown"
+description = "Parseur et exécuteur du format Spec Markdown (scénarios exécutables en Markdown)."
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+thiserror.workspace = true

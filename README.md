@@ -22,6 +22,16 @@ bibliothèque ECS.
 
 Tauri 2 · Rust · Svelte 5 + TypeScript · CEL · YAML
 
+## Développer
+
+```sh
+cargo test --workspace                                       # tous les tests, scénarios compris
+cargo test -p ecs-nide-specs --test scenarios -- --nocapture # rapport d'avancement des scénarios
+cargo run -p ecs-nide-core --example plan -- examples/space-shooter   # plan d'exécution d'un projet
+```
+
 ## État
 
-Phase 0 : spécification. Voir la feuille de route dans [`VISION.md`](VISION.md#13-feuille-de-route-proposée).
+Phase 0 (spécifications) terminée. Phase 1 (cœur Rust) en cours : l'ordonnancement est
+implémenté et ses scénarios passent. Voir la feuille de route dans
+[`VISION.md`](VISION.md#13-feuille-de-route-proposée).

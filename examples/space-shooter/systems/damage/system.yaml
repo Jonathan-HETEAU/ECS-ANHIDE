@@ -1,0 +1,14 @@
+name: Damage
+description: Applique aux points de vie les dégâts reçus pendant la frame.
+per_entity: true
+components:
+  Health: write
+  Hit: read
+  Invulnerable: without
+structural:
+  remove:
+  - Hit
+  may_add:
+  - Dead
+after:
+- Collision

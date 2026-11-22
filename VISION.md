@@ -433,8 +433,8 @@ les `spec.md` des systèmes dans l'IDE.
 
 | Phase | Contenu |
 |---|---|
-| 0 | Spécifications (ce document, `features/`, `exigences/`) **validées** |
-| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests |
+| 0 | Spécifications (ce document, `features/`, `exigences/`) **validées** — terminée |
+| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — en cours (ordonnancement fait) |
 | 2 | CLI `ecs-nide` : `validate`, `plan`, `contract` |
 | 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés |
 | 4 | Serveur MCP + génération de `AGENTS.md` et `.vscode/mcp.json` |

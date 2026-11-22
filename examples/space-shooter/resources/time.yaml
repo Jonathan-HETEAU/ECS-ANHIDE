@@ -1,0 +1,6 @@
+name: Time
+description: Temps écoulé depuis la frame précédente.
+fields:
+  delta:
+    type: f32
+    min: 0

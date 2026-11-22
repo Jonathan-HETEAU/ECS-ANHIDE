@@ -1,0 +1,13 @@
+name: Health
+description: Points de vie.
+fields:
+  current:
+    type: f32
+    min: 0
+    max: 1000
+    default: 100
+  max:
+    type: f32
+    min: 1
+    max: 1000
+    default: 100

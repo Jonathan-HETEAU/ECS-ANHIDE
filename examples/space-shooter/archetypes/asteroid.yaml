@@ -1,0 +1,9 @@
+name: Asteroid
+components:
+- Position
+- Velocity
+- Sprite
+- Collider
+- Health
+- Enemy
+estimated_count: 50000

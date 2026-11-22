@@ -1,0 +1,6 @@
+name: Lifetime
+description: Temps restant avant la disparition de l'entité, en secondes.
+fields:
+  remaining:
+    type: f32
+    min: 0

@@ -1,0 +1,5 @@
+name: Target
+description: Entité poursuivie.
+fields:
+  entity:
+    type: entity

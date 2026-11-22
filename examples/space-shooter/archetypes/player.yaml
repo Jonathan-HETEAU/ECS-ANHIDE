@@ -1,0 +1,9 @@
+name: Player
+components:
+- Position
+- Velocity
+- Sprite
+- Collider
+- Health
+- Player
+estimated_count: 1

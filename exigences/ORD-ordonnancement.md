@@ -23,8 +23,9 @@ Deux systèmes sont **en conflit** si l'un écrit une donnée que l'autre lit ou
 Les observateurs ne sont pas placés dans les étapes : ils s'exécutent aux points de
 synchronisation, seuls, et n'entrent donc en conflit avec aucun système.
 
-Deux systèmes sont **disjoints** si l'un déclare `with` sur un composant que l'autre déclare
-`without` : aucune entité ne peut être sélectionnée par les deux à la fois.
+Deux systèmes sont **disjoints** si l'un exige la présence d'un composant (accès `read`, `write`
+ou `with`) que l'autre déclare `without` : aucune entité ne peut être sélectionnée par les deux à la
+fois.
 
 ## Exigences
 
