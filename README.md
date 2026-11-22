@@ -16,6 +16,7 @@ bibliothèque ECS.
 | [`exigences/`](exigences/) | Le fonctionnement attendu, phrase par phrase (EARS) |
 | [`features/`](features/) | Les scénarios exécutables (Spec Markdown) |
 | [`AGENTS.md`](AGENTS.md) | Les règles de travail : tout part des tests |
+| [`recherche/`](recherche/) | Les études qui éclairent les décisions |
 
 ## Stack
 

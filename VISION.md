@@ -302,6 +302,9 @@ les `spec.md` des systèmes dans l'IDE.
 
 ## 14. Questions ouvertes
 
+> Une étude des principaux moteurs ECS propose une réponse à chacune de ces questions :
+> [`recherche/etat-de-l-art-ecs.md`](recherche/etat-de-l-art-ecs.md).
+
 - **Événements et messages** entre systèmes : concept à part entière, ou modélisés par des
   composants et des ressources ?
 - **Parallélisation par ensembles disjoints** : deux systèmes qui écrivent `Position`, l'un avec
