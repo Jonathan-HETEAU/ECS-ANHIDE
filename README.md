@@ -1,0 +1,26 @@
+# ECS NIDE
+
+**Un IDE de bureau pour concevoir des jeux en Entité-Composant-Système de manière déclarative.**
+
+Le projet est un trou noir. Les systèmes sont des planètes en orbite, et les entités sont des
+vaisseaux qui font le tour : un tour correspond à une frame. On décrit chaque système par son
+contrat, sa spécification et ses tests, sans écrire de code. Une IA, guidée par les skills du
+moteur choisi, l'implémente ensuite dans n'importe quel langage et n'importe quelle
+bibliothèque ECS.
+
+## Structure du dépôt
+
+| Chemin | Contenu |
+|---|---|
+| [`VISION.md`](VISION.md) | Ce qu'on attend du projet |
+| [`exigences/`](exigences/) | Le fonctionnement attendu, phrase par phrase (EARS) |
+| [`features/`](features/) | Les scénarios exécutables (Spec Markdown) |
+| [`AGENTS.md`](AGENTS.md) | Les règles de travail : tout part des tests |
+
+## Stack
+
+Tauri 2 · Rust · Svelte 5 + TypeScript · CEL · YAML
+
+## État
+
+Phase 0 : spécification. Voir la feuille de route dans [`VISION.md`](VISION.md#13-feuille-de-route-proposée).
