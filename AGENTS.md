@@ -42,6 +42,7 @@ Ce fichier s'adresse à toute personne ou IA qui travaille sur ce dépôt.
 | Application de bureau | Tauri 2 |
 | Cœur, CLI, serveur MCP | Rust (le cœur est une bibliothèque partagée) |
 | Interface | Svelte 5 + TypeScript |
+| Composants d'interface | UI SDK de Vercel Labs (`@ui-sdk/svelte`, version exacte figée), style par variables CSS, sans Tailwind |
 | Vue orbitale | PixiJS v8 (WebGPU si disponible, sinon WebGL 2) |
 | Traductions de l'interface | Paraglide JS (français en référence) |
 | Règles des propriétés | CEL |
@@ -83,12 +84,13 @@ cargo fmt --all
 | Crate | Rôle |
 |---|---|
 | `crates/spec-markdown` | Parseur et exécuteur du format Spec Markdown |
-| `crates/ecs-nide-core` | Le cœur : modèle, dossier projet (chargement, enregistrement, création), renommage et suppression, ordonnancement, contrats, validation |
+| `crates/ecs-nide-core` | Le cœur : modèle, dossier projet (chargement, enregistrement, création), renommage et suppression, ordonnancement, contrats, validation, exemples et propriétés (CEL), génération de données de test, import des rapports CTRF et JUnit |
+| `crates/ecs-nide-core/schemas` | Les schémas JSON publiés : données de test, champs d'extension CTRF |
 | `crates/ecs-nide-specs` | Les fonctions des étapes de `features/` et les tests de traçabilité |
 | `examples/space-shooter` | Le projet d'exemple décrit dans `features/README.md` |
 
 ## État actuel
 
-Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **en cours**. Faits : dossier projet,
-modélisation, ordonnancement, validation, contrats. Suite : vérification des exemples et des
-propriétés (CEL), puis la CLI (phase 2).
+Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **terminée** pour tout ce qui ne
+dépend ni de l'IDE ni de la simulation (dossier projet, modélisation, ordonnancement, validation,
+contrats et tests). Suite : la CLI `ecs-nide` (phase 2).

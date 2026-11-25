@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ecs-nide.dev/schemas/ctrf-extension.schema.json",
+  "title": "Champs d'extension ECS NIDE pour les rapports CTRF",
+  "description": "À placer dans `extra.ecsnide` de chaque test d'un rapport CTRF, pour rattacher le résultat à un exemple ou à une propriété (TST-011). Sans ces champs, ECS NIDE se rabat sur la convention de nommage `ecsnide::<Système>::example::<id>` ou `ecsnide::<Système>::property::<id>` (TST-014).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["system", "kind", "id"],
+  "properties": {
+    "system": { "type": "string", "description": "Nom du système ou de l'observateur." },
+    "kind": { "enum": ["example", "property"] },
+    "id": { "type": "string", "description": "Identifiant de l'exemple ou de la propriété." },
+    "counterexample": {
+      "type": "object",
+      "description": "Pour une propriété en échec : l'entrée qui la viole, par champ (`\"Health.current\": 0`).",
+      "additionalProperties": true
+    },
+    "seed": { "type": "integer", "minimum": 0, "description": "Graine qui reproduit le contre-exemple." }
+  }
+}

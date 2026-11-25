@@ -400,7 +400,9 @@ related:
   relations. Il ne prend pas en charge les composants activables, et le skill Bevy indique
   l'équivalent à utiliser.
 - **Rapports de tests.** Le format neutre est **CTRF** (JSON avec un schéma normatif), avec des
-  champs d'extension d'ECS NIDE : système, type de test, identifiant, contre-exemple, graine.
+  champs d'extension d'ECS NIDE : système, type de test, identifiant, contre-exemple, graine
+  (schéma publié : `crates/ecs-nide-core/schemas/ctrf-extension.schema.json`). Les données de test
+  générées suivent elles aussi un schéma publié (`schemas/test-data.schema.json`).
   **JUnit XML** est accepté aussi, grâce à la convention de nommage
   `ecsnide::<Système>::example::<id>` ou `ecsnide::<Système>::property::<id>`.
 - **Langue des fichiers générés.** `AGENTS.md` et les skills sont rédigés dans la langue du projet,
@@ -417,6 +419,7 @@ related:
 | Cœur : modèle, validation, ordonnancement, simulation, générateurs, protocole | **Rust** (bibliothèque partagée) |
 | Serveur MCP et CLI | **Rust**, un seul binaire `ecs-nide`, réutilisant le cœur |
 | Interface | **Svelte 5 + TypeScript** |
+| Composants d'interface | **UI SDK** de Vercel Labs (`@ui-sdk/svelte`), version exacte figée tant qu'il est en bêta ; style par **variables CSS**, sans Tailwind |
 | Vue orbitale | **PixiJS v8** : WebGPU quand il est disponible, sinon WebGL 2 |
 | Traductions de l'interface | **Paraglide JS**, le français étant la langue de référence |
 | Règles des propriétés | **CEL** |
@@ -447,9 +450,9 @@ les `spec.md` des systèmes dans l'IDE.
 | Phase | Contenu |
 |---|---|
 | 0 | Spécifications (ce document, `features/`, `exigences/`) **validées** — terminée |
-| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — en cours (dossier projet, modélisation, ordonnancement, validation et contrats faits) |
+| 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — terminée (hors scénarios qui dépendent de l'IDE ou de la simulation) |
 | 2 | CLI `ecs-nide` : `validate`, `plan`, `contract` |
-| 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés |
+| 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés — faite avec la phase 1 |
 | 4 | Serveur MCP + génération de `AGENTS.md` et `.vscode/mcp.json` |
 | 5 | IDE Tauri/Svelte : vue orbitale (prototype de rendu PixiJS mesuré d'abord sur Windows, macOS et Linux), éditeurs, diagnostics |
 | 6 | Simulation en mode modèle dans l'IDE |
@@ -472,6 +475,7 @@ Elles s'appuient sur l'étude des principaux moteurs ECS :
 | Rapports de tests | **CTRF**, et JUnit XML avec une convention de nommage |
 | Rendu | **PixiJS v8** (WebGPU si disponible, sinon WebGL 2), validé par un prototype mesuré |
 | Langue | Interface **internationalisée** (Paraglide JS), français en référence ; fichiers générés dans la langue du projet, l'anglais par défaut |
+| Composants d'interface (25 novembre 2026) | **UI SDK** de Vercel Labs, évalué dans `prototypes/ui-sdk-svelte` : composants sans style imposé, accessibles, pont pour agents ; version figée tant qu'il est en bêta, choix confirmé au début de la phase 5 ; style par variables CSS, sans Tailwind |
 | Nouveaux concepts | Composants **activables**, filtre **`changed`**, **phases**, **fréquence** (`every`), indication de **stockage** |
 | Observateurs et relations | **Comme Bevy** : événements, observateurs (exécutés au point de synchronisation de fin d'étape), relations avec composant cible tenu à jour, destruction liée, accès `via`, entités liées des archétypes |
 | Premier moteur cible | **Bevy** : skills, profil et sonde de débogage |

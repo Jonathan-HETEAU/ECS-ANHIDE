@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ecs-nide.dev/schemas/test-data.schema.json",
+  "title": "Données de test générées par ECS NIDE",
+  "description": "Entrées générées pour une propriété d'un système (TST-010). Chaque entrée donne les composants de l'entité et les ressources lues, avec leurs valeurs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "system", "property", "seed", "inputs"],
+  "properties": {
+    "format": { "type": "integer", "minimum": 1 },
+    "system": { "type": "string", "minLength": 1 },
+    "property": { "type": "string", "minLength": 1 },
+    "seed": { "type": "integer", "minimum": 0 },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["components", "resources"],
+        "properties": {
+          "components": { "$ref": "#/$defs/elements" },
+          "resources": { "$ref": "#/$defs/elements" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "elements": {
+      "description": "Par nom de composant ou de ressource : ses champs et leurs valeurs.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

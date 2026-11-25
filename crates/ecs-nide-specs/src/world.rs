@@ -2,8 +2,11 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use ecs_nide_core::contract::Contract;
 use ecs_nide_core::edit::EditError;
+use ecs_nide_core::generate::Dataset;
 use ecs_nide_core::load::load_project;
+use ecs_nide_core::reports::ImportedResults;
 use ecs_nide_core::save::save_project;
 use ecs_nide_core::schedule::{Plan, PlanError, compute_plan};
 use ecs_nide_core::validate::validate;
@@ -32,6 +35,18 @@ pub struct World {
     pub edit_result: Option<Result<(), EditError>>,
     pub plan: Option<Result<Plan, PlanError>>,
     pub plans: Vec<Plan>,
+    /// Le système ou l'observateur dont parlent les étapes suivantes.
+    pub current_actor: Option<String>,
+    /// L'exemple dont parlent les étapes suivantes.
+    pub current_example: Option<String>,
+    /// La propriété dont parlent les étapes suivantes : (système, identifiant).
+    pub current_property: Option<(String, String)>,
+    pub contract: Option<Contract>,
+    pub datasets: Vec<Dataset>,
+    pub exported: Option<PathBuf>,
+    pub imported: Option<ImportedResults>,
+    /// L'exemple créé à partir d'un contre-exemple : (système, identifiant).
+    pub converted: Option<(String, String)>,
 }
 
 impl Default for World {
@@ -50,6 +65,14 @@ impl Default for World {
             edit_result: None,
             plan: None,
             plans: Vec::new(),
+            current_actor: None,
+            current_example: None,
+            current_property: None,
+            contract: None,
+            datasets: Vec::new(),
+            exported: None,
+            imported: None,
+            converted: None,
         }
     }
 }

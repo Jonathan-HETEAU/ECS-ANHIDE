@@ -33,6 +33,8 @@ cargo run -p ecs-nide-core --example plan -- examples/space-shooter   # plan d'e
 
 ## État
 
-Phase 0 (spécifications) terminée. Phase 1 (cœur Rust) en cours : dossier projet, modélisation,
-ordonnancement, validation et contrats sont implémentés, et leurs scénarios passent. Voir la feuille de route dans
+Phase 0 (spécifications) terminée. Phase 1 (cœur Rust) terminée pour tout ce qui ne dépend ni de
+l'IDE ni de la simulation : dossier projet, modélisation, ordonnancement, validation, contrats, tests
+par exemples et par propriétés (CEL), génération de données de test, import des rapports. Suite :
+la CLI (phase 2). Voir la feuille de route dans
 [`VISION.md`](VISION.md#13-feuille-de-route-proposée).

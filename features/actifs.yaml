@@ -61,6 +61,26 @@
 - Une cascade circulaire d'observateurs est signalée
 - Une lecture via une relation compte comme une lecture
 
+04-contrats-et-tests.spec.md:
+- Le contrat d'un système contient tout ce qu'une IA doit savoir
+- Un scénario de spécification renvoie à des exemples existants
+- Un exemple décrit l'état avant et après le passage du système
+- Un exemple dont l'entrée n'est pas sélectionnée par le système est incohérent
+- Un exemple qui modifie un composant non déclaré est incohérent
+- Une propriété porte sur l'état avant et après le système
+- Un exemple qui contredit une propriété est signalé
+- Les données générées respectent les schémas et les domaines
+- Les valeurs limites sont toujours générées
+- La génération est reproductible avec une graine
+- Les données générées s'exportent dans un format neutre
+- Les résultats des tests exécutés à l'extérieur remontent dans l'IDE
+- Un contre-exemple devient un exemple en un clic
+- Un exemple peut décrire l'état des composants activables et les messages
+- Un exemple qui émet un message non déclaré est incohérent
+- Un rapport JUnit XML est rattaché grâce à la convention de nommage
+- Un résultat sans correspondance est signalé sans bloquer l'import
+- Un observateur a son contrat, ses exemples et ses propriétés
+
 09-validation.spec.md:
 - Une référence inconnue est une erreur
 - Un composant que personne ne fournit est signalé

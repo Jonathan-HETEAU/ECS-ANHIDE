@@ -30,6 +30,39 @@ impl EngineProfile {
     }
 }
 
+impl EngineProfile {
+    /// Le profil intégré d'un moteur cible (SKL-008), s'il est connu. C'est lui qu'installent
+    /// les skills du moteur, dans `skills/<moteur>/profile.yaml`.
+    pub fn for_engine(engine: &str) -> Option<Self> {
+        match engine {
+            // Bevy (SKL-010) : parallélisme entre systèmes et ensembles disjoints (With/Without),
+            // filtres Changed/Added, fréquence par conditions d'exécution, observateurs et
+            // relations. Pas de composant activable : seule l'entité entière se désactive.
+            "bevy" => Some(Self {
+                name: "bevy".to_string(),
+                inter_system_parallelism: true,
+                disjoint_sets: true,
+                toggleable_components: false,
+                change_filters: true,
+                system_frequency: true,
+                observers: true,
+                relationships: true,
+            }),
+            _ => None,
+        }
+    }
+
+    /// Le profil du moteur cible d'un projet, ou le profil générique (SKL-009).
+    pub fn of_project(project: &crate::Project) -> Self {
+        project
+            .manifest
+            .engine
+            .as_deref()
+            .and_then(Self::for_engine)
+            .unwrap_or_else(Self::generic)
+    }
+}
+
 impl Default for EngineProfile {
     fn default() -> Self {
         Self::generic()

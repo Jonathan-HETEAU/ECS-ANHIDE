@@ -11,10 +11,12 @@ use serde::Serialize;
 
 use crate::diagnostic::Diagnostic;
 use crate::edit::contains_word;
+use crate::examples::{Finding, check_examples};
 use crate::layout;
-use crate::load::{MANIFEST_FILE, SCHEDULE_FILE, SPEC_FILE};
+use crate::load::{EXAMPLES_FILE, MANIFEST_FILE, PROPERTIES_FILE, SCHEDULE_FILE, SPEC_FILE};
 use crate::model::{Fields, Io, Lifecycle, Project, Trigger};
 use crate::profile::EngineProfile;
+use crate::properties::check_properties;
 use crate::schedule::{PlanError, candidate_components, compute_plan};
 
 /// Au-delà, le calcul des archétypes atteignables s'arrête (garde-fou contre l'explosion
@@ -38,6 +40,7 @@ pub fn validate(project: &Project, profile: &EngineProfile) -> Vec<Diagnostic> {
     v.reachable();
     v.unused();
     v.tests_present();
+    v.tests();
     v.channels();
     v.events_observed();
     v.observers_triggerable();
@@ -728,6 +731,50 @@ impl Validator<'_> {
         }
     }
 
+    // --- TST-002 à TST-006, TST-012, TST-016 : exemples et propriétés -------------------------
+    fn tests(&mut self) {
+        let p = self.project;
+        let mut found: Vec<(Located, Finding)> = Vec::new();
+        let mut actors: Vec<TestedActor<'_>> = Vec::new();
+        for s in &p.systems {
+            actors.push((
+                s.name.clone(),
+                layout::system_dir(&s.name),
+                s.io(),
+                None,
+                &s.examples,
+                &s.properties,
+            ));
+        }
+        for o in &p.observers {
+            actors.push((
+                o.name.clone(),
+                layout::observer_dir(&o.name),
+                o.io(),
+                Some(&o.on),
+                &o.examples,
+                &o.properties,
+            ));
+        }
+        for (name, dir, io, trigger, examples, properties) in actors {
+            let examples_loc = located(&name, dir.join(EXAMPLES_FILE), &examples.to_vec());
+            for finding in check_examples(p, &name, io, trigger, examples) {
+                found.push((clone_loc(&examples_loc), finding));
+            }
+            let properties_loc = located(&name, dir.join(PROPERTIES_FILE), &properties.to_vec());
+            for finding in check_properties(p, &name, io, properties, examples) {
+                found.push((clone_loc(&properties_loc), finding));
+            }
+        }
+        for (loc, finding) in found {
+            if finding.error {
+                self.error(finding.code, &loc, &finding.needle, finding.message);
+            } else {
+                self.warning(finding.code, &loc, &finding.needle, finding.message);
+            }
+        }
+    }
+
     // --- VAL-012 : canaux sans émetteur ou sans lecteur ---------------------------------------
     fn channels(&mut self) {
         let mut emitted: BTreeMap<String, Located> = BTreeMap::new();
@@ -907,6 +954,17 @@ impl Validator<'_> {
         }
     }
 }
+
+/// Un système ou un observateur dont on vérifie les tests : nom, dossier, accès, déclencheur,
+/// exemples et propriétés.
+type TestedActor<'a> = (
+    String,
+    PathBuf,
+    Io<'a>,
+    Option<&'a Trigger>,
+    &'a [serde_yaml::Value],
+    &'a [serde_yaml::Value],
+);
 
 /// Une spécification à vérifier : élément, fichier, texte, exemples et propriétés.
 type SpecItem<'a> = (
