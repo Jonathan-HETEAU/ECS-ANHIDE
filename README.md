@@ -17,6 +17,7 @@ bibliothèque ECS.
 | [`features/`](features/) | Les scénarios exécutables (Spec Markdown) |
 | [`AGENTS.md`](AGENTS.md) | Les règles de travail : tout part des tests |
 | [`recherche/`](recherche/) | Les études qui éclairent les décisions |
+| [`prototypes/`](prototypes/) | Des prototypes jetables qui évaluent une technologie (hors produit) |
 
 ## Stack
 

@@ -1,0 +1,41 @@
+/*
+ * Thème d'ECS NIDE, sans Tailwind : uniquement des variables CSS.
+ * La feuille par défaut de UI SDK (@ui-sdk/core/web.css) lit les variables --ui-* ;
+ * on les redéfinit ici, et on ajoute les nôtres (--nide-*), que la vue orbitale lit aussi.
+ */
+@layer ui-sdk;
+
+:root {
+  color-scheme: dark;
+  --ui-font-size: 0.8125rem;
+  --ui-radius: 0.25rem;
+  --ui-primary: light-dark(oklch(0.55 0.17 265), oklch(0.72 0.14 265));
+  --ui-primary-foreground: oklch(0.98 0 0);
+
+  --nide-panel: light-dark(oklch(0.985 0 0), oklch(0.18 0.01 265));
+  --nide-space: light-dark(oklch(0.96 0.01 265), oklch(0.12 0.02 265));
+  --nide-orbit: light-dark(oklch(0.75 0.02 265), oklch(0.4 0.03 265));
+  --nide-phase-1: oklch(0.72 0.15 200);
+  --nide-phase-2: oklch(0.75 0.15 145);
+  --nide-phase-3: oklch(0.75 0.15 85);
+  --nide-phase-4: oklch(0.7 0.18 30);
+  --nide-phase-5: oklch(0.7 0.16 320);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ui-background);
+  color: var(--ui-foreground);
+  font-family: var(--ui-font-sans);
+  font-size: var(--ui-font-size);
+}

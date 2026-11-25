@@ -1,0 +1,22 @@
+{
+  "name": "ecs-nide-prototype-ui-sdk",
+  "private": true,
+  "type": "module",
+  "description": "Prototype jetable : évaluation de UI SDK (Vercel Labs) pour l'interface d'ECS NIDE.",
+  "scripts": {
+    "data": "cargo run -q -p ecs-nide-core --example export_json -- ../../examples/space-shooter > src/data.json",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node scripts/check.cjs"
+  },
+  "dependencies": {
+    "@ui-sdk/core": "0.1.0-beta.17",
+    "@ui-sdk/svelte": "0.1.0-beta.17"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.2",
+    "svelte": "^5.59.2",
+    "vite": "^8.3.8"
+  }
+}

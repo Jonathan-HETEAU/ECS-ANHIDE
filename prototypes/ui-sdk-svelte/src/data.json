@@ -1,0 +1,1399 @@
+{
+  "archetypes": [
+    {
+      "components": [
+        "Position",
+        "Velocity",
+        "Rotation",
+        "Sprite",
+        "Collider",
+        "Health",
+        "Enemy"
+      ],
+      "estimated_count": 50000,
+      "name": "Asteroid"
+    },
+    {
+      "components": [
+        "Position",
+        "Velocity",
+        "Sprite",
+        "Collider",
+        "Lifetime"
+      ],
+      "estimated_count": 10000,
+      "name": "Bullet"
+    },
+    {
+      "components": [
+        "Position",
+        "Velocity",
+        "Lifetime"
+      ],
+      "estimated_count": 2000000,
+      "name": "Particle"
+    },
+    {
+      "components": [
+        "Position",
+        "Velocity",
+        "Rotation",
+        "Sprite",
+        "Collider",
+        "Health",
+        "Player"
+      ],
+      "estimated_count": 1,
+      "name": "Player"
+    }
+  ],
+  "components": [
+    {
+      "description": "Disque de collision.",
+      "fields": {
+        "radius": {
+          "default": 1,
+          "min": 0,
+          "type": "f32"
+        }
+      },
+      "name": "Collider"
+    },
+    {
+      "description": "Entité à détruire.",
+      "name": "Dead"
+    },
+    {
+      "description": "Entité hostile au joueur.",
+      "name": "Enemy"
+    },
+    {
+      "description": "Points de vie.",
+      "fields": {
+        "current": {
+          "default": 100,
+          "max": 1000,
+          "min": 0,
+          "type": "f32"
+        },
+        "max": {
+          "default": 100,
+          "max": 1000,
+          "min": 1,
+          "type": "f32"
+        }
+      },
+      "name": "Health"
+    },
+    {
+      "description": "Dégâts reçus pendant la frame, en attente d'application.",
+      "fields": {
+        "amount": {
+          "max": 100000,
+          "min": 0,
+          "type": "f32"
+        }
+      },
+      "name": "Hit",
+      "storage": "sparse"
+    },
+    {
+      "description": "Entité qui ne subit pas de dégâts.",
+      "name": "Invulnerable"
+    },
+    {
+      "description": "Temps restant avant la disparition de l'entité, en secondes.",
+      "fields": {
+        "remaining": {
+          "min": 0,
+          "type": "f32"
+        }
+      },
+      "name": "Lifetime"
+    },
+    {
+      "description": "Entité contrôlée par le joueur.",
+      "name": "Player"
+    },
+    {
+      "description": "Position dans le monde.",
+      "fields": {
+        "value": {
+          "type": "vec2"
+        }
+      },
+      "name": "Position"
+    },
+    {
+      "description": "Orientation, en radians.",
+      "fields": {
+        "angle": {
+          "type": "f32"
+        }
+      },
+      "name": "Rotation"
+    },
+    {
+      "description": "Image affichée à la position de l'entité.",
+      "fields": {
+        "image": {
+          "type": "string"
+        }
+      },
+      "name": "Sprite"
+    },
+    {
+      "description": "Entité poursuivie.",
+      "fields": {
+        "entity": {
+          "type": "entity"
+        }
+      },
+      "name": "Target"
+    },
+    {
+      "description": "Vitesse, en unités par seconde.",
+      "fields": {
+        "value": {
+          "type": "vec2"
+        }
+      },
+      "name": "Velocity"
+    }
+  ],
+  "contracts": [
+    {
+      "after": [
+        "Movement"
+      ],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Collider": "read",
+        "Position": "read"
+      },
+      "description": "Détecte les contacts et inflige des dégâts.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect_absent": [
+            "Hit"
+          ],
+          "given": {
+            "Collider": {
+              "radius": 1
+            },
+            "Position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "id": "isolee"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Collision",
+      "per_entity": false,
+      "phase": "Physique",
+      "properties": [],
+      "resources": {},
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Disque de collision.",
+            "fields": {
+              "radius": {
+                "default": 1,
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Collider"
+          },
+          {
+            "description": "Dégâts reçus pendant la frame, en attente d'application.",
+            "fields": {
+              "amount": {
+                "max": 100000,
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Hit",
+            "storage": "sparse"
+          },
+          {
+            "description": "Position dans le monde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Position"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": []
+      },
+      "spec": "# Collision\n\nDeux entités dont les disques de collision se touchent reçoivent des dégâts.\n\n## Une entité isolée ne reçoit aucun dégât\nExemples : isolee\n* Une entité est seule dans le monde\n* Elle ne reçoit aucun coup\n",
+      "structural": {
+        "may_add": [
+          "Hit"
+        ]
+      },
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [
+        "Collision"
+      ],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Health": "write",
+        "Hit": "read",
+        "Invulnerable": "without"
+      },
+      "description": "Applique aux points de vie les dégâts reçus pendant la frame.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Health": {
+              "current": 70,
+              "max": 100
+            }
+          },
+          "expect_absent": [
+            "Hit"
+          ],
+          "given": {
+            "Health": {
+              "current": 100,
+              "max": 100
+            },
+            "Hit": {
+              "amount": 30
+            }
+          },
+          "id": "basique"
+        },
+        {
+          "expect": {
+            "Dead": {},
+            "Health": {
+              "current": 0,
+              "max": 100
+            }
+          },
+          "expect_absent": [
+            "Hit"
+          ],
+          "given": {
+            "Health": {
+              "current": 10,
+              "max": 100
+            },
+            "Hit": {
+              "amount": 50
+            }
+          },
+          "id": "plancher-zero"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Damage",
+      "per_entity": true,
+      "phase": "Resolution",
+      "properties": [
+        {
+          "description": "Les points de vie ne deviennent jamais négatifs.",
+          "domain": {
+            "Hit.amount": {
+              "max": 100000,
+              "min": 0
+            }
+          },
+          "ensure": "after.Health.current >= 0.0",
+          "id": "sante-positive"
+        },
+        {
+          "ensure": "after.Health.current <= before.Health.current",
+          "id": "sante-ne-remonte-pas"
+        }
+      ],
+      "resources": {},
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Entité à détruire.",
+            "name": "Dead"
+          },
+          {
+            "description": "Points de vie.",
+            "fields": {
+              "current": {
+                "default": 100,
+                "max": 1000,
+                "min": 0,
+                "type": "f32"
+              },
+              "max": {
+                "default": 100,
+                "max": 1000,
+                "min": 1,
+                "type": "f32"
+              }
+            },
+            "name": "Health"
+          },
+          {
+            "description": "Dégâts reçus pendant la frame, en attente d'application.",
+            "fields": {
+              "amount": {
+                "max": 100000,
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Hit",
+            "storage": "sparse"
+          },
+          {
+            "description": "Entité qui ne subit pas de dégâts.",
+            "name": "Invulnerable"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": []
+      },
+      "spec": "# Damage\n\nLes dégâts reçus pendant la frame sont retirés des points de vie, puis effacés.\n\n## Les dégâts réduisent les points de vie\nExemples : basique\n* Une entité à \"100\" points de vie reçoit un coup de \"30\"\n* Elle termine la frame à \"70\" points de vie, sans coup en attente\n\n## Les points de vie ne descendent jamais sous zéro\nExemples : plancher-zero\nPropriétés : sante-positive\n* Une entité à \"10\" points de vie reçoit un coup de \"50\"\n* Elle termine à \"0\" point de vie et elle est marquée morte\n",
+      "structural": {
+        "may_add": [
+          "Dead"
+        ],
+        "remove": [
+          "Hit"
+        ]
+      },
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [
+        "Damage"
+      ],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Dead": "with"
+      },
+      "description": "Détruit les entités mortes et met à jour le score.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect_despawned": true,
+          "expect_resources": {
+            "GameState": {
+              "score": 11
+            }
+          },
+          "given": {
+            "Dead": {}
+          },
+          "given_resources": {
+            "GameState": {
+              "score": 10
+            }
+          },
+          "id": "un-point"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Death",
+      "per_entity": false,
+      "phase": "Resolution",
+      "properties": [],
+      "resources": {
+        "GameState": "write"
+      },
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Entité à détruire.",
+            "name": "Dead"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": [
+          {
+            "description": "État global de la partie.",
+            "fields": {
+              "score": {
+                "type": "u32"
+              }
+            },
+            "name": "GameState"
+          }
+        ]
+      },
+      "spec": "# Death\n\nLes entités mortes disparaissent et font gagner un point chacune.\n\n## Une entité morte disparaît et rapporte un point\nExemples : un-point\n* Une entité est marquée morte et le score vaut \"10\"\n* L'entité est détruite et le score vaut \"11\"\n",
+      "structural": {
+        "despawn": true
+      },
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Dead": "without",
+        "Enemy": "with",
+        "Position": "read",
+        "Target": "optional",
+        "Velocity": "write"
+      },
+      "description": "Oriente la vitesse des ennemis vers leur cible.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Velocity": {
+              "value": {
+                "x": 5,
+                "y": 0
+              }
+            }
+          },
+          "given": {
+            "Enemy": {},
+            "Position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            "Velocity": {
+              "value": {
+                "x": 5,
+                "y": 0
+              }
+            }
+          },
+          "id": "sans-cible"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "EnemyAI",
+      "per_entity": false,
+      "phase": "Logique",
+      "properties": [],
+      "resources": {},
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Entité à détruire.",
+            "name": "Dead"
+          },
+          {
+            "description": "Entité hostile au joueur.",
+            "name": "Enemy"
+          },
+          {
+            "description": "Position dans le monde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Position"
+          },
+          {
+            "description": "Entité poursuivie.",
+            "fields": {
+              "entity": {
+                "type": "entity"
+              }
+            },
+            "name": "Target"
+          },
+          {
+            "description": "Vitesse, en unités par seconde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Velocity"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": []
+      },
+      "spec": "# EnemyAI\n\nChaque ennemi vivant oriente sa vitesse vers sa cible, s'il en a une.\n\n## Un ennemi sans cible garde sa vitesse\nExemples : sans-cible\n* Un ennemi sans cible avance à \"5\" unités par seconde vers la droite\n* Il garde la même vitesse\n",
+      "structural": {},
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Lifetime": "write"
+      },
+      "description": "Décompte le temps restant et détruit les entités expirées.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Lifetime": {
+              "remaining": 0.75
+            }
+          },
+          "given": {
+            "Lifetime": {
+              "remaining": 1
+            }
+          },
+          "given_resources": {
+            "Time": {
+              "delta": 0.25
+            }
+          },
+          "id": "decompte"
+        },
+        {
+          "expect_despawned": true,
+          "given": {
+            "Lifetime": {
+              "remaining": 0.1
+            }
+          },
+          "given_resources": {
+            "Time": {
+              "delta": 0.25
+            }
+          },
+          "id": "expiration"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Lifetime",
+      "per_entity": true,
+      "phase": "Resolution",
+      "properties": [],
+      "resources": {
+        "Time": "read"
+      },
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Temps restant avant la disparition de l'entité, en secondes.",
+            "fields": {
+              "remaining": {
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Lifetime"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": [
+          {
+            "description": "Temps écoulé depuis la frame précédente.",
+            "fields": {
+              "delta": {
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Time"
+          }
+        ]
+      },
+      "spec": "# Lifetime\n\nLe temps restant diminue du temps écoulé ; une entité arrivée à zéro disparaît.\n\n## Le temps restant diminue\nExemples : decompte\n* Une entité a \"1\" seconde à vivre\n* Après \"0.25\" seconde, il lui reste \"0.75\" seconde\n\n## Une entité expirée disparaît\nExemples : expiration\n* Une entité a \"0.1\" seconde à vivre\n* Après \"0.25\" seconde, elle est détruite\n",
+      "structural": {
+        "may_despawn": true
+      },
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Position": "write",
+        "Velocity": "read"
+      },
+      "description": "Fait avancer les entités selon leur vitesse.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Position": {
+              "value": {
+                "x": 5,
+                "y": -2.5
+              }
+            }
+          },
+          "given": {
+            "Position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              }
+            },
+            "Velocity": {
+              "value": {
+                "x": 10,
+                "y": -5
+              }
+            }
+          },
+          "given_resources": {
+            "Time": {
+              "delta": 0.5
+            }
+          },
+          "id": "demi-seconde"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Movement",
+      "per_entity": true,
+      "phase": "Physique",
+      "properties": [],
+      "resources": {
+        "Time": "read"
+      },
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Position dans le monde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Position"
+          },
+          {
+            "description": "Vitesse, en unités par seconde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Velocity"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": [
+          {
+            "description": "Temps écoulé depuis la frame précédente.",
+            "fields": {
+              "delta": {
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Time"
+          }
+        ]
+      },
+      "spec": "# Movement\n\nChaque entité avance selon sa vitesse et le temps écoulé depuis la frame précédente.\n\n## Une entité avance proportionnellement au temps écoulé\nExemples : demi-seconde\n* Une entité à l'origine file à \"10\" unités par seconde en x et \"-5\" en y\n* Après \"0.5\" seconde, elle est en \"5\", \"-2.5\"\n",
+      "structural": {},
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Player": "with",
+        "Velocity": "write"
+      },
+      "description": "Applique les commandes du joueur à la vitesse de son vaisseau.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Velocity": {
+              "value": {
+                "x": 300,
+                "y": 0
+              }
+            }
+          },
+          "given": {
+            "Player": {},
+            "Velocity": {
+              "value": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "given_resources": {
+            "InputState": {
+              "fire": false,
+              "thrust": {
+                "x": 1,
+                "y": 0
+              }
+            }
+          },
+          "id": "poussee-droite"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "PlayerInput",
+      "per_entity": true,
+      "phase": "Entrees",
+      "properties": [],
+      "resources": {
+        "InputState": "read"
+      },
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Entité contrôlée par le joueur.",
+            "name": "Player"
+          },
+          {
+            "description": "Vitesse, en unités par seconde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Velocity"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": [
+          {
+            "description": "État des commandes du joueur.",
+            "fields": {
+              "fire": {
+                "type": "bool"
+              },
+              "thrust": {
+                "type": "vec2"
+              }
+            },
+            "name": "InputState"
+          }
+        ]
+      },
+      "spec": "# PlayerInput\n\nLa vitesse du vaisseau du joueur vaut la poussée commandée multipliée par sa vitesse maximale,\n300 unités par seconde.\n\n## La poussée fixe la vitesse\nExemples : poussee-droite\n* Le joueur pousse vers la droite\n* Son vaisseau file à \"300\" unités par seconde vers la droite\n",
+      "structural": {},
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Position": "read",
+        "Rotation": "optional",
+        "Sprite": "read"
+      },
+      "description": "Dessine les entités visibles.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect": {
+            "Position": {
+              "value": {
+                "x": 3,
+                "y": 4
+              }
+            },
+            "Sprite": {
+              "image": "asteroid.png"
+            }
+          },
+          "given": {
+            "Position": {
+              "value": {
+                "x": 3,
+                "y": 4
+              }
+            },
+            "Sprite": {
+              "image": "asteroid.png"
+            }
+          },
+          "id": "dessin"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Render",
+      "per_entity": true,
+      "phase": "Rendu",
+      "properties": [],
+      "resources": {},
+      "schemas": {
+        "archetypes": [],
+        "components": [
+          {
+            "description": "Position dans le monde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Position"
+          },
+          {
+            "description": "Orientation, en radians.",
+            "fields": {
+              "angle": {
+                "type": "f32"
+              }
+            },
+            "name": "Rotation"
+          },
+          {
+            "description": "Image affichée à la position de l'entité.",
+            "fields": {
+              "image": {
+                "type": "string"
+              }
+            },
+            "name": "Sprite"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": []
+      },
+      "spec": "# Render\n\nChaque entité visible est dessinée à sa position, tournée selon sa rotation si elle en a une. Le\nrendu ne modifie aucune donnée.\n\n## Le rendu ne modifie rien\nExemples : dessin\n* Une entité visible est dessinée\n* Ses composants sont inchangés\n",
+      "structural": {},
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    },
+    {
+      "after": [],
+      "before": [],
+      "changed": [],
+      "components": {
+        "Player": "with",
+        "Position": "read"
+      },
+      "description": "Crée des projectiles quand le joueur tire.",
+      "engine": {
+        "profile": {
+          "change_filters": true,
+          "disjoint_sets": false,
+          "inter_system_parallelism": true,
+          "name": "generic",
+          "observers": true,
+          "relationships": true,
+          "system_frequency": true,
+          "toggleable_components": true
+        },
+        "skill": null
+      },
+      "every": 1,
+      "examples": [
+        {
+          "expect_spawned": [
+            "Bullet"
+          ],
+          "given": {
+            "Player": {},
+            "Position": {
+              "value": {
+                "x": 10,
+                "y": 20
+              }
+            }
+          },
+          "given_resources": {
+            "InputState": {
+              "fire": true,
+              "thrust": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "id": "tir"
+        },
+        {
+          "expect_spawned": [],
+          "given": {
+            "Player": {},
+            "Position": {
+              "value": {
+                "x": 10,
+                "y": 20
+              }
+            }
+          },
+          "given_resources": {
+            "InputState": {
+              "fire": false,
+              "thrust": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          },
+          "id": "sans-tir"
+        }
+      ],
+      "kind": "system",
+      "messages": {},
+      "name": "Weapon",
+      "per_entity": false,
+      "phase": "Logique",
+      "properties": [],
+      "resources": {
+        "InputState": "read"
+      },
+      "schemas": {
+        "archetypes": [
+          {
+            "components": [
+              "Position",
+              "Velocity",
+              "Sprite",
+              "Collider",
+              "Lifetime"
+            ],
+            "estimated_count": 10000,
+            "name": "Bullet"
+          }
+        ],
+        "components": [
+          {
+            "description": "Disque de collision.",
+            "fields": {
+              "radius": {
+                "default": 1,
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Collider"
+          },
+          {
+            "description": "Temps restant avant la disparition de l'entité, en secondes.",
+            "fields": {
+              "remaining": {
+                "min": 0,
+                "type": "f32"
+              }
+            },
+            "name": "Lifetime"
+          },
+          {
+            "description": "Entité contrôlée par le joueur.",
+            "name": "Player"
+          },
+          {
+            "description": "Position dans le monde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Position"
+          },
+          {
+            "description": "Image affichée à la position de l'entité.",
+            "fields": {
+              "image": {
+                "type": "string"
+              }
+            },
+            "name": "Sprite"
+          },
+          {
+            "description": "Vitesse, en unités par seconde.",
+            "fields": {
+              "value": {
+                "type": "vec2"
+              }
+            },
+            "name": "Velocity"
+          }
+        ],
+        "events": [],
+        "messages": [],
+        "relationships": [],
+        "resources": [
+          {
+            "description": "État des commandes du joueur.",
+            "fields": {
+              "fire": {
+                "type": "bool"
+              },
+              "thrust": {
+                "type": "vec2"
+              }
+            },
+            "name": "InputState"
+          }
+        ]
+      },
+      "spec": "# Weapon\n\nQuand le joueur tire, un projectile apparaît à la position de son vaisseau.\n\n## Tirer crée un projectile\nExemples : tir\n* Le joueur appuie sur la gâchette\n* Un projectile est créé\n\n## Sans tir, rien n'est créé\nExemples : sans-tir\n* Le joueur n'appuie pas sur la gâchette\n* Aucun projectile n'est créé\n",
+      "structural": {
+        "may_spawn": [
+          "Bullet"
+        ]
+      },
+      "toggles": {},
+      "trigger": null,
+      "triggered_observers": [],
+      "triggers": {},
+      "via": {}
+    }
+  ],
+  "diagnostics": [],
+  "manifest": {
+    "format": 1,
+    "language": "fr",
+    "name": "space-shooter"
+  },
+  "plan": {
+    "ambiguities": [],
+    "format": 1,
+    "observer_cycles": [],
+    "profile": {
+      "change_filters": true,
+      "disjoint_sets": false,
+      "inter_system_parallelism": true,
+      "name": "generic",
+      "observers": true,
+      "relationships": true,
+      "system_frequency": true,
+      "toggleable_components": true
+    },
+    "resolved_order": [
+      "PlayerInput",
+      "EnemyAI",
+      "Weapon",
+      "Movement",
+      "Collision",
+      "Damage",
+      "Lifetime",
+      "Death",
+      "Render"
+    ],
+    "stages": [
+      {
+        "observers": [],
+        "stage": 1,
+        "systems": [
+          {
+            "every": 1,
+            "name": "PlayerInput",
+            "phase": "Entrees"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 2,
+        "systems": [
+          {
+            "every": 1,
+            "name": "EnemyAI",
+            "phase": "Logique"
+          },
+          {
+            "every": 1,
+            "name": "Weapon",
+            "phase": "Logique"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 3,
+        "systems": [
+          {
+            "every": 1,
+            "name": "Movement",
+            "phase": "Physique"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 4,
+        "systems": [
+          {
+            "every": 1,
+            "name": "Collision",
+            "phase": "Physique"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 5,
+        "systems": [
+          {
+            "every": 1,
+            "name": "Damage",
+            "phase": "Resolution"
+          },
+          {
+            "every": 1,
+            "name": "Lifetime",
+            "phase": "Resolution"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 6,
+        "systems": [
+          {
+            "every": 1,
+            "name": "Death",
+            "phase": "Resolution"
+          }
+        ]
+      },
+      {
+        "observers": [],
+        "stage": 7,
+        "systems": [
+          {
+            "every": 1,
+            "name": "Render",
+            "phase": "Rendu"
+          }
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "description": "État global de la partie.",
+      "fields": {
+        "score": {
+          "type": "u32"
+        }
+      },
+      "name": "GameState"
+    },
+    {
+      "description": "État des commandes du joueur.",
+      "fields": {
+        "fire": {
+          "type": "bool"
+        },
+        "thrust": {
+          "type": "vec2"
+        }
+      },
+      "name": "InputState"
+    },
+    {
+      "description": "Temps écoulé depuis la frame précédente.",
+      "fields": {
+        "delta": {
+          "min": 0,
+          "type": "f32"
+        }
+      },
+      "name": "Time"
+    }
+  ],
+  "schedule": {
+    "order": [
+      "PlayerInput",
+      "EnemyAI",
+      "Weapon",
+      "Movement",
+      "Collision",
+      "Damage",
+      "Lifetime",
+      "Death",
+      "Render"
+    ],
+    "phases": [
+      "Entrees",
+      "Logique",
+      "Physique",
+      "Resolution",
+      "Rendu"
+    ]
+  }
+}
