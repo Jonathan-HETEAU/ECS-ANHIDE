@@ -451,7 +451,7 @@ les `spec.md` des systèmes dans l'IDE.
 |---|---|
 | 0 | Spécifications (ce document, `features/`, `exigences/`) **validées** — terminée |
 | 1 | Cœur Rust : format du dossier projet, modèle, validation, ordonnancement, avec leurs tests — terminée (hors scénarios qui dépendent de l'IDE ou de la simulation) |
-| 2 | CLI `ecs-nide` : `validate`, `plan`, `contract` |
+| 2 | CLI `ecs-nide` : `new`, `validate`, `plan`, `contract`, `gen-tests`, `import-results` — terminée |
 | 3 | Tests : exemples, propriétés CEL, générateurs, cohérence entre exemples et propriétés — faite avec la phase 1 |
 | 4 | Serveur MCP + génération de `AGENTS.md` et `.vscode/mcp.json` |
 | 5 | IDE Tauri/Svelte : vue orbitale (prototype de rendu PixiJS mesuré d'abord sur Windows, macOS et Linux), éditeurs, diagnostics |

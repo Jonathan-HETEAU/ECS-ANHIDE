@@ -77,6 +77,9 @@ impl fmt::Display for Diagnostic {
             }
             write!(f, "]")?;
         }
+        if let Some(code) = &self.code {
+            write!(f, " {code}")?;
+        }
         write!(f, " : {}", self.message)
     }
 }

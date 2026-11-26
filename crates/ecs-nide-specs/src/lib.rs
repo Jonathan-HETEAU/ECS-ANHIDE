@@ -8,4 +8,4 @@ pub mod repo;
 pub mod steps;
 mod world;
 
-pub use world::World;
+pub use world::{CliRun, World};

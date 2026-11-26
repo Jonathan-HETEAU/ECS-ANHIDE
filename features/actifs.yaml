@@ -81,6 +81,12 @@
 - Un résultat sans correspondance est signalé sans bloquer l'import
 - Un observateur a son contrat, ses exemples et ses propriétés
 
+07-mcp-et-cli.spec.md:
+- La CLI propose les mêmes opérations que le cœur
+- La CLI échoue quand le projet est invalide
+- La CLI écrit ses résultats en JSON pour les outils
+- La CLI crée un projet
+
 09-validation.spec.md:
 - Une référence inconnue est une erreur
 - Un composant que personne ne fournit est signalé

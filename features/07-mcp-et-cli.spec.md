@@ -42,13 +42,25 @@ Exigences : MCP-007, PRJ-004
 * Un client MCP ajoute un exemple à "Damage"
 * En moins d'une seconde, l'IDE affiche le nouvel exemple
 
-## La CLI propose les mêmes opérations
+## La CLI propose les mêmes opérations que le cœur
 Exigences : MCP-009, MCP-010
 * Exécuter "ecs-nide validate", "ecs-nide plan", "ecs-nide contract Damage", "ecs-nide gen-tests Damage --seed 42" et "ecs-nide import-results rapport.json" sur le projet d'exemple
-* Chaque commande réussit et produit le même résultat que l'opération équivalente dans l'IDE
+* Chaque commande réussit et produit les mêmes données que l'opération équivalente du cœur, que partagent l'IDE et le serveur MCP
 
 ## La CLI échoue quand le projet est invalide
 Exigences : MCP-011
 * Introduire une référence au composant inexistant "Mana" dans le projet d'exemple
 * Exécuter "ecs-nide validate"
 * La commande se termine avec un code de sortie non nul et affiche le diagnostic
+
+## La CLI écrit ses résultats en JSON pour les outils
+Exigences : MCP-012
+* Introduire une référence au composant inexistant "Mana" dans le projet d'exemple
+* Exécuter "ecs-nide validate --format json"
+* La sortie est une liste JSON de diagnostics, dont l'erreur "composant inconnu : Mana" avec son code, son fichier et sa ligne
+
+## La CLI crée un projet
+Exigences : MCP-013, PRJ-001, PRJ-010
+* Exécuter "ecs-nide new asteroides --name Asteroides --language fr" dans un dossier vide
+* La commande réussit
+* Le dossier "asteroides" contient un projet valide, avec un "AGENTS.md" rédigé en français

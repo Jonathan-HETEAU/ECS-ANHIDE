@@ -1,5 +1,6 @@
 //! Les fonctions des étapes, regroupées par domaine.
 
+mod cli;
 mod contrats;
 mod modelisation;
 mod ordonnancement;
@@ -15,6 +16,7 @@ pub fn registry() -> Registry<World> {
     let mut registry = Registry::new();
     projet::register(&mut registry);
     contrats::register(&mut registry);
+    cli::register(&mut registry);
     modelisation::register(&mut registry);
     ordonnancement::register(&mut registry);
     validation::register(&mut registry);

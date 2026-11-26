@@ -9,7 +9,8 @@
 //! - [`contract`] : le contrat d'un système ou d'un observateur ;
 //! - [`examples`], [`properties`], [`generate`], [`reports`] : les tests par exemples et par
 //!   propriétés, la génération de données de test et l'import des résultats ;
-//! - [`validate`] : la validation du modèle.
+//! - [`validate`] : la validation du modèle ;
+//! - [`ops`] : les opérations communes à l'IDE, à la CLI et au serveur MCP.
 
 pub mod contract;
 pub mod create;
@@ -20,6 +21,7 @@ pub mod generate;
 pub mod layout;
 pub mod load;
 pub mod model;
+pub mod ops;
 pub mod profile;
 pub mod properties;
 pub mod reports;

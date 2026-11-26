@@ -47,6 +47,18 @@ pub struct World {
     pub imported: Option<ImportedResults>,
     /// L'exemple créé à partir d'un contre-exemple : (système, identifiant).
     pub converted: Option<(String, String)>,
+    /// Les exécutions de la CLI, dans l'ordre.
+    pub cli_runs: Vec<CliRun>,
+}
+
+/// Une exécution de la CLI : arguments, dossier courant, code de sortie et sorties.
+#[derive(Debug, Clone)]
+pub struct CliRun {
+    pub args: Vec<String>,
+    pub cwd: PathBuf,
+    pub code: i32,
+    pub stdout: String,
+    pub stderr: String,
 }
 
 impl Default for World {
@@ -73,11 +85,31 @@ impl Default for World {
             exported: None,
             imported: None,
             converted: None,
+            cli_runs: Vec::new(),
         }
     }
 }
 
 impl World {
+    /// Exécute une ligne de commande `ecs-nide …` dans le dossier `cwd`.
+    pub fn run_cli(&mut self, line: &str, cwd: &Path) -> Result<CliRun, String> {
+        let args: Vec<String> = line.split_whitespace().map(String::from).collect();
+        if args.first().map(String::as_str) != Some("ecs-nide") {
+            return Err(format!("commande inattendue : {line}"));
+        }
+        let (mut out, mut err) = (Vec::new(), Vec::new());
+        let code = ecs_nide_cli::run(args.clone(), cwd, &mut out, &mut err);
+        let run = CliRun {
+            args,
+            cwd: cwd.to_path_buf(),
+            code,
+            stdout: String::from_utf8_lossy(&out).into_owned(),
+            stderr: String::from_utf8_lossy(&err).into_owned(),
+        };
+        self.cli_runs.push(run.clone());
+        Ok(run)
+    }
+
     /// Un sous-dossier neuf de l'espace de travail du scénario.
     pub fn new_dir(&self, name: &str) -> PathBuf {
         let mut path = self.workspace.path().join(name);

@@ -86,11 +86,12 @@ cargo fmt --all
 | `crates/spec-markdown` | Parseur et exécuteur du format Spec Markdown |
 | `crates/ecs-nide-core` | Le cœur : modèle, dossier projet (chargement, enregistrement, création), renommage et suppression, ordonnancement, contrats, validation, exemples et propriétés (CEL), génération de données de test, import des rapports CTRF et JUnit |
 | `crates/ecs-nide-core/schemas` | Les schémas JSON publiés : données de test, champs d'extension CTRF |
+| `crates/ecs-nide-cli` | La ligne de commande `ecs-nide` (binaire), qui appelle les opérations de `ecs_nide_core::ops` |
 | `crates/ecs-nide-specs` | Les fonctions des étapes de `features/` et les tests de traçabilité |
 | `examples/space-shooter` | Le projet d'exemple décrit dans `features/README.md` |
 
 ## État actuel
 
 Phase 0 (spécifications) : **terminée**. Phase 1 (cœur Rust) : **terminée** pour tout ce qui ne
-dépend ni de l'IDE ni de la simulation (dossier projet, modélisation, ordonnancement, validation,
-contrats et tests). Suite : la CLI `ecs-nide` (phase 2).
+dépend ni de l'IDE ni de la simulation. Phase 2 (CLI `ecs-nide`) : **terminée**. Suite : le serveur
+MCP (phase 4), qui réutilise les mêmes opérations.
